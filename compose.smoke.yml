@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: league_smoke
+      POSTGRES_USER: smoke_admin
+      POSTGRES_PASSWORD: smoke-test-only-password
+    command:
+      - postgres
+      - -c
+      - shared_buffers=32MB
+      - -c
+      - max_connections=20
+    volumes:
+      - smoke_database:/var/lib/postgresql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  backend:
+    image: edehson-backend:release
+    pull_policy: never
+    environment:
+      PORT: "8011"
+      GIN_MODE: release
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: league_smoke
+      POSTGRES_USER: smoke_admin
+      POSTGRES_PASSWORD: smoke-test-only-password
+      ADMIN_TOKEN: smoke-test-only-admin-key-not-for-production-1234567890
+      GOMEMLIMIT: "96MiB"
+    ports:
+      - "127.0.0.1:8012:8011"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  smoke_database:
