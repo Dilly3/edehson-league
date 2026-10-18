@@ -1,0 +1,120 @@
+x-logging: &default-logging
+  driver: local
+  options:
+    max-size: "5m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+
+    command:
+      - postgres
+      - -c
+      - shared_buffers=32MB
+      - -c
+      - max_connections=20
+      - -c
+      - work_mem=1MB
+      - -c
+      - maintenance_work_mem=32MB
+      - -c
+      - autovacuum_work_mem=16MB
+      - -c
+      - max_parallel_workers=0
+      - -c
+      - max_parallel_workers_per_gather=0
+
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+    networks:
+      - database
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    logging: *default-logging
+
+  backend:
+    image: ${BACKEND_IMAGE:?Set BACKEND_IMAGE}
+    restart: unless-stopped
+
+    environment:
+      PORT: "8011"
+      GIN_MODE: release
+
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?Set ADMIN_TOKEN}
+
+      GOMEMLIMIT: "96MiB"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    networks:
+      - database
+      - proxy
+
+    logging: *default-logging
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+
+    environment:
+      API_DOMAIN: ${API_DOMAIN:?Set API_DOMAIN}
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+    depends_on:
+      backend:
+        condition: service_started
+
+    networks:
+      - proxy
+
+    logging: *default-logging
+
+networks:
+  database:
+    internal: true
+  proxy:
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:
+
+
+
+  # docker buildx build \
+  # --platform linux/amd64 \
+  # --load \
+  # --tag edehson-backend:release \
+  # ./backend
