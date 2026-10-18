@@ -9,14 +9,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) Ready(c *gin.Context) {
+func (s *Server) Ready(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(
 		c.Request.Context(),
 		2*time.Second,
 	)
 	defer cancel()
 
-	if err := h.GetSQLDB().PingContext(ctx); err != nil {
+	if err := s.GetSQLDB().PingContext(ctx); err != nil {
 		log.Printf("Database readiness check failed: %v", err)
 
 		c.JSON(http.StatusServiceUnavailable, gin.H{
@@ -32,7 +32,7 @@ func (h *Handler) Ready(c *gin.Context) {
 	})
 }
 
-func (h *Handler) Health(c *gin.Context) {
+func (s *Server) Health(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "ok",
 		"service": "RealEdehsons League API",

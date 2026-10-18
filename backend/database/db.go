@@ -30,7 +30,9 @@ func ConnectDB(host, port, user, password, dbname string) (*gorm.DB, *sql.DB, er
 	}
 	url := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
-	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
+		TranslateError: true,
+	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("Could not connect to PostgreSQL: %v", err)
 	}
@@ -56,5 +58,9 @@ func ConnectDB(host, port, user, password, dbname string) (*gorm.DB, *sql.DB, er
 	}
 
 	log.Println("Connected to PostgreSQL")
+	err = automigrate(db)
+	if err != nil {
+		return nil, nil, err
+	}
 	return db, sqlDB, nil
 }

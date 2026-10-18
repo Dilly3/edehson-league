@@ -28,9 +28,14 @@ func main() {
 	if apiport == "" {
 		apiport = ":8011"
 	}
+	// ADMIN TOKEN
+	adminToken := os.Getenv("ADMIN_TOKEN")
+	if len(adminToken) < 32 {
+		log.Fatal("ADMIN_TOKEN must contain at least 32 characters")
+	}
 
-	h := router.NewHandler(db, sqldb)
-	ginrouter := router.ConnectRouter(h)
+	h := router.NewServer(db, sqldb)
+	ginrouter := router.ConnectRouter(h, adminToken)
 
 	// SERVER
 	server := &http.Server{
