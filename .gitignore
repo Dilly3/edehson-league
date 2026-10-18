@@ -5,3 +5,22 @@
 .DS_Store
 node_modules/
 dist/
+
+releases/
+
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfplan
+infra/terraform.tfvars
+infra/crash.log
+
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+crash.log
+
+# Local database backups
+backups/

@@ -1,0 +1,12 @@
+{$API_DOMAIN} {
+	@api path /api /api/*
+
+	handle @api {
+		header Cache-Control "no-store"
+		reverse_proxy backend:8011
+	}
+
+	handle {
+		respond "Not found" 404
+	}
+}
