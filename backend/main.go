@@ -34,8 +34,11 @@ func main() {
 		log.Fatal("ADMIN_TOKEN must contain at least 32 characters")
 	}
 
-	h := router.NewServer(db, sqldb)
-	ginrouter := router.ConnectRouter(h, adminToken)
+	h, err := router.NewServer(db, sqldb, adminToken)
+	if err != nil {
+		log.Fatalf("ADMIN TOKEN is empty:%s", err.Error())
+	}
+	ginrouter := router.ConnectRouter(h)
 
 	// SERVER
 	server := &http.Server{
