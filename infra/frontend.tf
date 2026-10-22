@@ -47,7 +47,24 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
   signing_protocol                  = "sigv4"
 }
 
+# Serve the SPA entry point only for the explicit admin route.
+resource "aws_cloudfront_function" "admin_route" {
+  name    = "edehsons-admin-route"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = <<-JS
+    function handler(event) {
+      var request = event.request;
+      if (request.uri === '/admin' || request.uri === '/admin/') {
+        request.uri = '/index.html';
+      }
+      return request;
+    }
+  JS
+}
+
 resource "aws_cloudfront_distribution" "frontend" {
+  aliases             = ["edehsons.sportslive.com.ng"]
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
@@ -62,7 +79,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   origin {
-    domain_name = "edehsons-league.duckdns.org"
+    domain_name = "api.sportslive.com.ng"
     origin_id   = "lightsail-api"
 
     custom_origin_config {
@@ -82,6 +99,10 @@ resource "aws_cloudfront_distribution" "frontend" {
 
     compress        = true
     cache_policy_id = data.aws_cloudfront_cache_policy.static.id
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.admin_route.arn
+    }
   }
 
   dynamic "ordered_cache_behavior" {
@@ -117,7 +138,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    acm_certificate_arn      = aws_acm_certificate_validation.frontend.certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 }
 
@@ -169,9 +192,13 @@ output "frontend_bucket_name" {
 }
 
 output "frontend_url" {
-  value = "https://${aws_cloudfront_distribution.frontend.domain_name}"
+  value = "https://edehsons.sportslive.com.ng"
 }
 
 output "frontend_distribution_id" {
   value = aws_cloudfront_distribution.frontend.id
+}
+
+output "cloudfront_url" {
+  value = "https://${aws_cloudfront_distribution.frontend.domain_name}"
 }
