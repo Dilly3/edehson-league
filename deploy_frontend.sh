@@ -15,4 +15,4 @@ aws s3 cp frontend/dist/index.html \
 
 aws cloudfront create-invalidation \
   --distribution-id "$DISTRIBUTION_ID" \
-  --paths "/" "/index.html" "/crest.svg"
+  --paths "/" "/index.html" "/crest.svg" "/admin" "/admin/"

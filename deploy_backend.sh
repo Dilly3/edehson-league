@@ -72,7 +72,7 @@ sudo -n docker image load --input "$archive"
 
 healthy() {
   curl --fail --silent --show-error --connect-timeout 3 --max-time 5 \
-    https://edehsons-league.duckdns.org/api/ready 2>/dev/null |
+    https://api.sportslive.com.ng/api/ready 2>/dev/null |
     python3 -c 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d.get("status")=="ready" and d.get("database")=="connected" else 1)' 2>/dev/null
 }
 rollback() {
