@@ -2,22 +2,64 @@ package router
 
 import "github.com/gin-gonic/gin"
 
-func ConnectRouter(s *Server, adminToken string) *gin.Engine {
+func ConnectRouter(s *Server) *gin.Engine {
 	router := gin.Default()
 	api := router.Group("/api")
 
 	api.GET("/health", s.Health)
 	api.GET("/ready", s.Ready)
+	api.GET("/admin/session", s.requireAdmin(s.GetAdminToken()), s.AdminSession)
 
 	// TEAMS
 	teams := router.Group("/api/teams")
 	teams.GET("", s.GetTeam)
-	teams.POST("", s.requireAdmin(adminToken), s.CreateTeam)
+	teams.PATCH("/:tag/name", s.requireAdmin(s.GetAdminToken()), s.EditTeamName)
+	teams.POST("", s.requireAdmin(s.GetAdminToken()), s.CreateTeam)
 
 	//PLAYERS
 	players := router.Group("/api/teams/:tag/players")
 	players.Use(s.verifyTeam)
 	players.GET("", s.GetPlayer)
-	players.POST("", s.requireAdmin(adminToken), s.CreatePlayer)
+	players.POST("", s.requireAdmin(s.GetAdminToken()), s.CreatePlayer)
+	players.PUT(
+		"/:playerID",
+		s.requireAdmin(s.GetAdminToken()),
+		s.EditPlayer,
+	)
+
+	players.PUT(
+		"/:playerID/captain",
+		s.requireAdmin(s.GetAdminToken()),
+		s.SetCaptain,
+	)
+
+	players.DELETE(
+		"/:playerID",
+		s.requireAdmin(s.GetAdminToken()),
+		s.DeletePlayer,
+	)
+
+	// FIXTURES
+	fixtures := router.Group("/api/fixtures")
+	fixtures.GET("", s.GetFixtures)
+	fixtures.GET("/:fixtureID", s.GetFixture)
+	fixtures.POST("/generate", s.requireAdmin(s.GetAdminToken()), s.GenerateFixture)
+	fixtures.PATCH("/:fixtureID/kickoff", s.requireAdmin(s.GetAdminToken()), s.EditFixture)
+	fixtures.PATCH(
+		"/:fixtureID/venue",
+		s.requireAdmin(s.GetAdminToken()),
+		s.EditFixtureVenue,
+	)
+
+	fixtures.PATCH("/:fixtureID/broadcast", s.requireAdmin(s.GetAdminToken()), s.EditFixtureBroadcast)
+
+	// RESULT
+	fixtures.PUT("/:fixtureID/result", s.requireAdmin(s.GetAdminToken()), s.EditResult)
+
+	// STANDING
+	api.GET("/standings", s.GetStandings)
+	api.GET("/player-stats", s.GetPlayerStats)
+	api.GET("/top-scorers", s.GetTopScorers)
+	// RETURN ROUTER
 	return router
 }
