@@ -118,8 +118,8 @@ abbr {
   flex-shrink: 0;
 }
 .brand img {
-  width: 72px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -323,7 +323,7 @@ h1 {
 }
 .feature-match {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 88px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 180px minmax(0, 1fr);
   align-items: center;
   gap: 24px;
   padding: 26px 0 28px;
@@ -350,7 +350,9 @@ h1 {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  min-width: 150px;
+  min-width: 0;
+  width: 100%;
+  justify-self: center;
   text-align: center;
 }
 .feature-score {
@@ -371,7 +373,7 @@ h1 {
   font-weight: 800;
   font-size: clamp(36px, 5vw, 56px);
   line-height: 1;
-  letter-spacing: 0.06em;
+  letter-spacing: 0;
   text-transform: uppercase;
   color: var(--volt);
 }
@@ -1094,7 +1096,7 @@ h1 {
 }
 .admin-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
   margin-bottom: 24px;
 }
@@ -1204,8 +1206,8 @@ h1 {
   color: #fff;
 }
 .footer-brand img {
-  width: 45px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
 }
 
@@ -1449,8 +1451,8 @@ h1 {
     font-size: 22px;
   }
   .brand img {
-    width: 60px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
   }
   .header-actions .admin-button.MuiButton-root {
     padding: 5px 10px;
@@ -1496,11 +1498,12 @@ h1 {
     height: 180px;
   }
   .feature-match {
+    grid-template-columns: minmax(0, 1fr) 100px minmax(0, 1fr);
     gap: 8px;
     padding: 20px 0 22px;
   }
   .feature-centre {
-    min-width: 88px;
+    min-width: 0;
   }
   .feature .crest {
     width: 56px !important;
@@ -1741,7 +1744,7 @@ h1 {
   .header-actions { gap: 0; }
   .brand-name { font-size: 20px; }
   .brand { gap: 6px; }
-  .brand img { width: 48px; height: 36px; }
+  .brand img { width: 36px; height: 36px; }
 }
 :root[data-theme="dark"] .player-stat-cards dd,
 :root[data-theme="dark"] .generate-total { color: var(--volt); }
@@ -1796,3 +1799,51 @@ h1 {
 .team-roster-heading { margin: 22px 0 12px; font-family: var(--display); font-size: 24px; text-transform: uppercase; }
 @media (min-width: 1000px) { .team-summary-panel .team-summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .team-summary-panel { padding: 0 16px 16px; } }
+
+.match-preview { padding: 18px 0 4px; }
+.match-preview > h3 { margin: 0 0 8px; font-family: var(--display); font-size: 28px; text-transform: uppercase; }
+.match-preview-note { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.match-preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 18px 0; }
+.match-preview-team { min-width: 0; padding: 18px; border: 1px solid var(--rule); background: var(--paper); }
+.match-preview-team header { display: flex; gap: 10px; align-items: center; }
+.match-preview-team header > div { min-width: 0; }
+.match-preview-team h4 { margin: 0; font-family: var(--display); font-size: 24px; overflow-wrap: anywhere; }
+.match-preview-team header span { color: var(--ink-2); font-size: 12px; }
+.match-preview-team h5 { margin: 18px 0 6px; font-size: 15px; }
+.match-preview-team p { margin: 6px 0; font-size: 14px; line-height: 1.6; }
+.match-preview-numbers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 18px 0; border-block: 1px solid var(--rule); padding: 12px 0; }
+.match-preview-numbers dt { font-size: 12px; color: var(--ink-2); }
+.match-preview-numbers dd { margin: 4px 0 0; font-family: var(--display); font-size: 32px; font-weight: 700; }
+.match-preview-scorers { margin: 0; padding: 0; list-style: none; }
+.match-preview-scorers li { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.match-preview-scorers .text-link { min-height: 32px; overflow-wrap: anywhere; }
+.match-preview-scorers li > span { font-size: 13px; color: var(--ink-2); }
+@media (max-width: 600px) { .match-preview-grid { grid-template-columns: 1fr; } }
+
+/* Featured broadcast: match identity stays visible before opening the player. */
+.broadcast-section { margin-block: 24px; }
+.broadcast-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; padding: 0 20px 20px; }
+.broadcast-card { padding: 20px; border: 1px solid var(--rule); border-radius: 16px; background: var(--paper); }
+.broadcast-card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: .8rem; }
+.broadcast-teams { display: grid; grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr); align-items: center; gap: 12px; margin-top: 24px; }
+.broadcast-teams > div { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; min-width: 0; }
+.broadcast-teams strong { overflow-wrap: anywhere; }
+.broadcast-score { text-align: center; font-size: 1.3rem; font-weight: 800; }
+.broadcast-card > p { text-align: center; }
+.broadcast-card > button { display: flex; margin: 16px auto 0; }
+.broadcast-empty, .broadcast-note { padding: 0 20px 20px; margin: 0; }
+@media (max-width: 600px) { .broadcast-cards { padding-inline: 12px; } .broadcast-card { padding: 16px 12px; } .broadcast-teams { gap: 6px; grid-template-columns: minmax(0, 1fr) 60px minmax(0, 1fr); } }
+
+.team-management-toolbar { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+
+.admin-login-page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; padding: 32px 20px; background: var(--paper); }
+.admin-login-brand { display: flex; align-items: center; gap: 12px; color: var(--ink); text-decoration: none; font-weight: 800; }
+.admin-login-panel { width: 100%; max-width: 440px; padding: 32px; }
+.admin-login-panel h1 { margin: 12px 0; }
+.admin-login-panel > .text-link { display: inline-block; margin-top: 24px; }
+@media (max-width: 480px) { .admin-login-panel { padding: 24px; } }
+
+.admin-login-error { color: #b91c1c; font-weight: 600; animation: admin-login-error-blink 1s ease-in-out 3; }
+[data-theme="dark"] .admin-login-error { color: #fca5a5; }
+@keyframes admin-login-error-blink { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+@media (prefers-reduced-motion: reduce) { .admin-login-error { animation: none; } }

@@ -31,6 +31,7 @@ export default function AdminForms({
   fixtures: import("../types").Fixture[];
   onSaved: () => void;
 }) {
+  const [displayName, setDisplayName] = useState("");
   const [name, setName] = useState(""),
     [tag, setTag] = useState(""),
     [team, setTeam] = useState(defaultTeam || teams[0]?.tag || ""),
@@ -58,6 +59,7 @@ export default function AdminForms({
       setError("Set your admin key before saving.");
       return;
     }
+    if (action === "team" && Array.from(displayName.trim()).length > 12) { setError("Display name must contain at most 12 characters."); return; }
     setBusy(true);
     try {
       if (action === "team")
@@ -68,6 +70,7 @@ export default function AdminForms({
             body: JSON.stringify({
               name: name.trim(),
               tag: tag.trim().toUpperCase(),
+              display_name: displayName.trim() || null,
             }),
           },
           token,
@@ -131,6 +134,7 @@ export default function AdminForms({
                   autoFocus
                   slotProps={{ htmlInput: { minLength: 2, maxLength: 20 } }}
                 />
+                <TextField label="Display name (optional)" value={displayName} onChange={e => setDisplayName(e.target.value)} helperText="Up to 12 characters, e.g. Man Utd. Used in match events." slotProps={{ htmlInput: { maxLength: 12 } }} />
                 <TextField
                   label="Team tag"
                   value={tag}
