@@ -64,11 +64,11 @@ resource "aws_cloudfront_function" "admin_route" {
 }
 
 resource "aws_cloudfront_distribution" "frontend" {
-  aliases             = ["edehsons.sportslive.com.ng"]
+  aliases             = ["greatminds.sportslive.com.ng", "edehsons.sportslive.com.ng"]
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  comment             = "RealEdehsons League"
+  comment             = "GreatMindsSport"
   price_class         = "PriceClass_100"
   wait_for_deployment = true
 
@@ -138,7 +138,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate_validation.frontend.certificate_arn
+    acm_certificate_arn      = aws_acm_certificate_validation.greatminds.certificate_arn
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }
@@ -192,7 +192,7 @@ output "frontend_bucket_name" {
 }
 
 output "frontend_url" {
-  value = "https://edehsons.sportslive.com.ng"
+  value = "https://greatminds.sportslive.com.ng"
 }
 
 output "frontend_distribution_id" {

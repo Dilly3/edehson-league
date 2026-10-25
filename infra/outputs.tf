@@ -3,5 +3,5 @@ output "public_ip" {
 }
 
 output "api_domain" {
-  value = "edehsons-league.duckdns.org"
+  value = "api.sportslive.com.ng"
 }
