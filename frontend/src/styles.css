@@ -416,7 +416,8 @@ h1 {
 .feature-empty {
   padding: 48px 36px 52px;
 }
-.feature-empty h1 {
+.feature-empty h1,
+.feature-empty h2 {
   color: #fff;
 }
 .feature-empty p {
@@ -1847,3 +1848,484 @@ h1 {
 [data-theme="dark"] .admin-login-error { color: #fca5a5; }
 @keyframes admin-login-error-blink { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
 @media (prefers-reduced-motion: reduce) { .admin-login-error { animation: none; } }
+
+.membership-toolbar, .membership-filters, .membership-buttons { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.membership-toolbar { justify-content: space-between; margin-bottom: 24px; }
+.membership-filters > :first-child { width: 112px; }
+.membership-summary { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin: 24px 0; }
+.membership-summary article, .membership-member-cards article { border: 1px solid var(--rule); border-radius: 16px; padding: 20px; background: var(--card); }
+.membership-summary span { display: block; font-size: .78rem; margin-bottom: 10px; }
+.membership-summary strong { display: block; font-size: 1.3rem; overflow-wrap: anywhere; }
+.membership-panel { overflow: hidden; }
+.membership-table-scroll { max-width: 100%; overflow-x: auto; }
+.membership-table { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.membership-table th, .membership-table td { padding: 12px 16px; border-bottom: 1px solid var(--rule); text-align: center; white-space: nowrap; }
+.membership-table th { font-weight: 700; }
+.membership-table tr > :first-child { text-align: left; }
+.membership-table thead { background: var(--paper); }
+.membership-table tbody th { position: sticky; left: 0; z-index: 1; background: var(--card); min-width: 180px; max-width: 240px; white-space: normal; }
+.membership-table tbody th .text-link { text-align: left; overflow-wrap: anywhere; }
+.due-cell { border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; background: var(--paper); color: var(--ink); cursor: pointer; font: inherit; min-width: 90px; }
+.due-cell small { display: block; margin-top: 4px; font-size: .65rem; text-transform: uppercase; letter-spacing: .05em; }
+.due-paid { border-color: #15803d; }
+.due-unpaid { border-color: #b45309; }
+.due-waived { border-style: dashed; }
+.membership-unissued { font-size: .72rem; color: var(--ink); opacity: .65; }
+.membership-inactive { display: block; margin-top: 4px; font-weight: 400; }
+.membership-note { padding: 16px 20px; font-size: .85rem; }
+.membership-member-cards { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.membership-member-cards h3 { margin-top: 0; text-transform: capitalize; }
+.membership-records article { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--rule); padding: 12px 0; }
+.membership-records article span { display: block; margin-top: 4px; font-size: .82rem; }
+.membership-history { padding-left: 20px; }
+.membership-history li { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.membership-history time { display: block; margin-top: 4px; font-size: .78rem; }
+.membership-history pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .8rem; }
+.membership-admin-entry { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; padding: 24px; gap: 16px; }
+@media (max-width: 900px) { .membership-summary { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 600px) { .membership-member-cards { grid-template-columns: 1fr; } .membership-filters { width: 100%; } .membership-filters > :last-child { flex: 1; min-width: 150px; } .membership-table th, .membership-table td { padding: 10px; } .membership-table tbody th { min-width: 140px; max-width: 180px; } .membership-summary article { padding: 14px; } .membership-summary strong { font-size: 1.1rem; } }
+
+.membership-member-cards.membership-flip-cards { grid-template-columns: repeat(2,minmax(0,1fr)); justify-items: center; gap: 16px; padding-block: 12px; }
+.member-fine-card { display: block; width: 100%; max-width: 230px; height: 280px; border: 0; padding: 0; border-radius: 18px; background: transparent; cursor: pointer; font: inherit; text-align: left; perspective: 1000px; }
+.member-fine-card-yellow { color: #302300; --fine-card-fill: #facc15; --fine-card-rule: rgba(48,35,0,.25); }
+.member-fine-card-red { color: #fff; --fine-card-fill: #b91c1c; --fine-card-rule: rgba(255,255,255,.35); }
+.member-fine-card-inner { display: block; width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform .45s ease; }
+.member-fine-card.is-flipped .member-fine-card-inner { transform: rotateY(180deg); }
+.member-fine-card-front, .member-fine-card-back { position: absolute; inset: 0; display: flex; flex-direction: column; border-radius: 18px; padding: 24px; background: var(--fine-card-fill); color: inherit; backface-visibility: hidden; -webkit-backface-visibility: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.12); overflow: hidden; }
+.member-fine-card-front { justify-content: space-between; }
+.member-fine-card-front > strong { font-size: clamp(1.4rem,4vw,2.1rem); line-height: 1.08; letter-spacing: -.04em; }
+.member-fine-card-front > span, .member-fine-card-hint { font-size: .72rem; }
+.member-fine-card-back { transform: rotateY(180deg); gap: 12px; }
+.member-fine-card-back > strong { font-size: 1rem; }
+.member-fine-card-stats { display: grid; gap: 9px; }
+.member-fine-card-stats > span { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: .8rem; }
+.member-fine-card-stats b { font-size: 1.2rem; }
+.member-fine-card-balance { display: grid; gap: 5px; border-top: 1px solid var(--fine-card-rule); padding-top: 10px; }
+.member-fine-card-balance > span { font-size: .72rem; }
+.member-fine-card-balance strong { font-size: 1.08rem; overflow-wrap: anywhere; }
+.member-fine-card-hint { margin-top: auto; }
+.member-fine-card:focus-visible { outline: 3px solid var(--ink); outline-offset: 5px; }
+@media (max-width: 480px) { .membership-member-cards.membership-flip-cards { gap: 12px; } .member-fine-card { height: 265px; } .member-fine-card-front, .member-fine-card-back { padding: 18px 12px; } .member-fine-card-stats > span { font-size: .7rem; } }
+@media (prefers-reduced-motion: reduce) { .member-fine-card-inner { transition: none; } }
+
+.member-payments { border: 1px solid var(--rule); border-radius: 20px; overflow: hidden; margin-top: 12px; background: var(--card); }
+.member-payments-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; padding: 24px; background: var(--paper); border-bottom: 1px solid var(--rule); }
+.member-payments-header h3 { font-size: 1.6rem; margin: 6px 0 0; letter-spacing: -.04em; }
+.member-payments-filters { display: flex; flex-wrap: wrap; gap: 12px; }
+.member-payments-filters > :first-child { min-width: 100px; }
+.member-payments-filters > :last-child { min-width: 180px; }
+.member-payment-totals { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 0; margin: 0; padding: 22px 24px; border-bottom: 1px solid var(--rule); }
+.member-payment-totals > div { padding: 0 18px; border-left: 1px solid var(--rule); }
+.member-payment-totals > div:first-child { padding-left: 0; border-left: 0; }
+.member-payment-totals dt { font-size: .73rem; margin-bottom: 8px; }
+.member-payment-totals dd { margin: 0; font-size: clamp(.95rem,2vw,1.4rem); font-weight: 800; overflow-wrap: anywhere; }
+.member-payments-table { min-width: 460px; }
+.member-payments-table tbody th { min-width: 115px; max-width: none; }
+.member-payments-table tbody tr:nth-child(even) td, .member-payments-table tbody tr:nth-child(even) th { background: var(--paper); }
+.member-payments-table td { padding-block: 16px; }
+.member-payment-status { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; min-height: 30px; border: 1px solid var(--rule); border-radius: 999px; padding: 4px 10px; font-size: .8rem; font-weight: 700; }
+.payment-status-paid { border-color: #15803d; }
+.payment-status-unpaid { border-color: #b45309; }
+.payment-status-waived { border-style: dashed; }
+.member-payments-legend { display: flex; flex-wrap: wrap; gap: 12px 18px; margin: 0; padding: 18px 24px; font-size: .72rem; border-top: 1px solid var(--rule); }
+.member-payments-empty { padding: 20px 24px; text-align: center; }
+.membership-admin-audit { margin-top: 20px; border: 1px solid var(--rule); border-radius: 12px; padding: 16px; }
+.membership-admin-audit > summary { cursor: pointer; font-weight: 700; }
+@media (max-width: 600px) { .member-payments-header { padding: 18px 16px; } .member-payments-filters { width: 100%; } .member-payments-filters > :last-child { flex: 1; min-width: 140px; } .member-payment-totals { padding: 18px 14px; } .member-payment-totals > div { padding-inline: 10px; } .member-payment-totals dt { font-size: .65rem; } .member-payments-legend { padding: 16px; } }
+
+.membership-directory { min-width: 0; }
+.membership-directory th, .membership-directory td { padding: 20px 24px; }
+.membership-directory tbody th { position: static; width: 65%; min-width: 0; max-width: none; }
+.membership-directory td { text-align: right; }
+.membership-directory thead th:last-child { text-align: right; }
+.membership-directory tbody tr:hover td, .membership-directory tbody tr:hover th { background: var(--paper); }
+.membership-toolbar .membership-filters > :first-child { width: auto; min-width: 180px; }
+.membership-filters > .MuiTextField-root { min-width: 120px; }
+.member-payments-filters > .MuiTextField-root { min-width: 100px; }
+@media (max-width: 600px) { .membership-directory th, .membership-directory td { padding: 16px 12px; } .membership-toolbar .membership-filters > .MuiTextField-root { flex: 1 1 130px; min-width: 0; } }
+
+.membership-table .membership-row-inactive { --inactive-text: #64748b; --inactive-fill: #f1f5f9; }
+.membership-table .membership-row-inactive > th, .membership-table .membership-row-inactive > td,
+.membership-directory tbody .membership-row-inactive:hover > th, .membership-directory tbody .membership-row-inactive:hover > td { color: var(--inactive-text); background: var(--inactive-fill); }
+.membership-table .membership-row-inactive .text-link, .membership-table .membership-row-inactive .due-cell { color: var(--inactive-text); }
+.membership-table .membership-row-inactive .due-cell { background: var(--inactive-fill); }
+[data-theme="dark"] .membership-table .membership-row-inactive { --inactive-text: #94a3b8; --inactive-fill: #1e293b; }
+
+/* The league has its own navigation within the GreatMindsSport app. */
+.league-navigation { margin: 24px 0; }
+.league-navigation h1 { font-size: clamp(1.4rem, 4vw, 2rem); margin: 0 0 16px; overflow-wrap: anywhere; }
+.league-navigation nav { display: flex; gap: 6px; overflow-x: auto; padding: 6px; border: 1px solid var(--rule); border-radius: 20px; }
+.league-navigation .nav-item { flex: 0 0 auto; min-height: 44px; border-radius: 14px; color: var(--ink-2); }
+.league-navigation .nav-item:hover { background: var(--rule-soft); color: var(--ink); }
+.league-navigation .nav-item.active { background: var(--pitch); color: #fff; box-shadow: none; }
+
+.header-actions .viewer-logout.MuiButton-root { color: #fff; border: 1px solid rgba(255,255,255,.75); border-radius: 12px; min-height: 44px; padding: 6px 12px; white-space: nowrap; }
+.header-actions .viewer-logout.MuiButton-root:hover { background: rgba(255,255,255,.14); border-color: #fff; }
+@media (max-width: 700px) { .header-actions .viewer-logout.MuiButton-root { padding: 5px 8px; } .header-actions { padding-block: 6px; } }
+
+/* Club access: a single accessible PIN input over four visual slots. */
+.viewer-welcome-page { min-height: 100dvh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 44px 20px; background: radial-gradient(ellipse at 50% 0%, rgba(110,146,78,.14), transparent 65%), var(--paper); }
+.viewer-welcome-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; color: var(--ink); font: 800 26px var(--display); letter-spacing: -.02em; }
+.viewer-welcome-brand img { width: 46px; height: 46px; }
+.viewer-welcome-brand b { color: var(--link); }
+.viewer-access-card { width: min(100%,480px); overflow: hidden; border: 1px solid var(--rule); border-radius: 26px; background: var(--card); box-shadow: 0 24px 64px rgba(7,34,21,.10); }
+.viewer-access-masthead { display: flex; justify-content: space-between; align-items: center; padding: 16px 28px; background: var(--pitch); color: #fff; font: 700 12px var(--body); letter-spacing: .12em; }
+.viewer-access-masthead > span:first-child { display: flex; align-items: center; gap: 9px; }
+.viewer-access-masthead i { width: 7px; height: 7px; border-radius: 50%; background: var(--volt); box-shadow: 0 0 0 4px rgba(212,242,58,.12); }
+.viewer-access-masthead > span:last-child { opacity: .65; }
+.viewer-access-content { padding: 32px 34px 28px; }
+.viewer-welcome-kicker { font-size: 10px; font-weight: 800; letter-spacing: .18em; color: var(--ink-3); }
+.viewer-access-content h1 { font-family: var(--display); font-size: clamp(40px,8vw,55px); font-weight: 800; line-height: 1.02; letter-spacing: -.02em; text-transform: none; margin: 14px 0 16px; }
+.viewer-access-content h1 span { color: var(--link); }
+.viewer-welcome-description { color: var(--ink-2); font-size: 14px; line-height: 1.6; max-width: 32ch; margin: 0; }
+.viewer-access-destinations { display: flex; gap: 7px; margin: 18px 0 28px; }
+.viewer-access-destinations span { border: 1px solid var(--rule); padding: 4px 12px; border-radius: 20px; color: var(--ink-2); font-size: 11px; font-weight: 700; }
+.viewer-access-form { display: flex; flex-direction: column; }
+.viewer-pin-label { font-size: 13px; font-weight: 700; margin-bottom: 12px; color: var(--ink); }
+.viewer-pin-entry { position: relative; border-radius: 14px; }
+.viewer-pin-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; z-index: 1; cursor: text; font-size: 20px; }
+.viewer-pin-slots { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 12px; }
+.viewer-pin-slots > span { display: grid; place-items: center; height: 70px; border: 1px solid var(--rule); border-radius: 13px; background: var(--paper); color: var(--link); font-size: 23px; transition: border-color .18s, box-shadow .18s, background .18s; }
+.viewer-pin-slots i { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); opacity: .35; }
+.viewer-pin-entry:focus-within .is-next { border-color: var(--link); box-shadow: 0 0 0 3px color-mix(in srgb,var(--link) 15%,transparent); }
+.viewer-pin-slots > .is-filled { border-color: var(--link); background: color-mix(in srgb,var(--link) 6%,var(--card)); }
+.viewer-pin-entry.has-error .viewer-pin-slots > span { border-color: var(--red); }
+.viewer-pin-entry.is-busy { opacity: .6; }
+.viewer-pin-feedback { min-height: 36px; margin: 12px 0 18px; color: var(--ink-3); font-size: 12px; line-height: 1.5; }
+.viewer-pin-feedback.is-error { color: var(--red); font-weight: 700; }
+.viewer-access-form .viewer-enter-button.MuiButton-root { min-height: 52px; justify-content: space-between; gap: 12px; padding: 12px 18px; border-radius: 13px; font-family: var(--body); font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: none; box-shadow: none; }
+.viewer-enter-button > span { font-size: 22px; line-height: 1; }
+.viewer-access-footer { border-top: 1px dashed var(--rule); padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: color-mix(in srgb,var(--paper) 50%,var(--card)); }
+.viewer-access-footer > span { font-size: 9px; font-weight: 800; letter-spacing: .09em; color: var(--ink-3); }
+.viewer-access-footer a { font-size: 12px; font-weight: 700; text-decoration: none; color: var(--link); white-space: nowrap; }
+.viewer-access-footer a:hover { text-decoration: underline; }
+.viewer-idle-note { max-width: 340px; text-align: center; color: var(--ink-3); font-size: 11px; line-height: 1.6; margin: 22px 0 0; }
+@media(max-width:480px) { .viewer-welcome-page { padding: 28px 16px; } .viewer-access-content { padding: 26px 24px 24px; } .viewer-access-masthead,.viewer-access-footer { padding-left: 24px; padding-right: 24px; } .viewer-pin-slots { gap: 9px; } .viewer-pin-slots > span { height: 62px; } .viewer-access-footer > span { font-size: 8px; } }
+
+@media (max-height:800px) and (min-width:481px) { .viewer-welcome-page { padding-block: 24px; } .viewer-welcome-brand { margin-bottom: 18px; } .viewer-access-content { padding: 22px 30px; } .viewer-access-content h1 { font-size: 46px; margin: 10px 0 12px; } .viewer-access-destinations { margin: 12px 0 20px; } .viewer-pin-slots > span { height: 60px; } .viewer-pin-feedback { min-height: 18px; margin: 10px 0 16px; } .viewer-access-footer { padding-block: 14px; } .viewer-idle-note { margin-top: 14px; } }
+
+/* Football backdrop and translucent access card. */
+.viewer-welcome-page { --paper: #10261b; --ink: #fffdf6; --ink-2: #e0e7dc; --ink-3: #c2cdbf; --rule: rgba(255,255,255,.24); --link: #d4f23a; background: linear-gradient(90deg,rgba(3,18,10,.48),rgba(3,18,10,.22)),url('/football-login-background.jpg') center / cover no-repeat; }
+.viewer-welcome-brand { color: #fffdf6; text-shadow: 0 2px 14px rgba(0,0,0,.6); }
+.viewer-access-card { background: rgba(14,33,23,.73); border-color: rgba(255,255,255,.28); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 24px 70px rgba(0,0,0,.3); }
+.viewer-access-masthead { background: rgba(15,61,43,.56); }
+.viewer-access-content h1 { font-family: Georgia,'Times New Roman',serif; font-style: italic; font-size: clamp(38px,7vw,51px); font-weight: 400; letter-spacing: -.045em; line-height: 1.08; }
+.viewer-access-content h1 span { display: inline-block; font-size: 1.2em; font-weight: 700; letter-spacing: -.025em; }
+.viewer-access-footer { background: rgba(3,20,11,.16); }
+.viewer-pin-slots > span { background: rgba(3,19,10,.14); }
+.viewer-pin-slots > .is-filled { background: rgba(212,242,58,.10); }
+.viewer-access-form .viewer-enter-button.MuiButton-root { background: #d4f23a; color: #14271b; }
+.viewer-access-form .viewer-enter-button.MuiButton-root:hover { background: #e0fb67; }
+.viewer-access-form .viewer-enter-button.MuiButton-root.Mui-disabled { background: rgba(212,242,58,.20); color: rgba(255,255,255,.60); }
+.viewer-idle-note { color: #e2e9dc; text-shadow: 0 1px 6px rgba(0,0,0,.9); }
+.viewer-pin-feedback.is-error { color: #ffb6a5; }
+@media(max-width:480px) { .viewer-welcome-page { background-position: 72% center; } }
+@media(max-height:800px) and (min-width:481px) { .viewer-access-content h1 { font-size: 42px; } }
+.viewer-welcome-page { max-width: none; width: 100%; margin: 0; }
+
+/* Keep the football scene behind the register; data surfaces stay legible. */
+.app-shell.roaster-background { position: relative; isolation: isolate; --roaster-wash: rgba(243,240,232,.74); --roaster-panel: rgba(255,253,248,.92); }
+.app-shell.roaster-background::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(var(--roaster-wash),var(--roaster-wash)),url('/football-login-background.jpg') center / cover no-repeat; }
+.roaster-background .membership-panel { background: var(--roaster-panel); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); border-radius: 18px; box-shadow: 0 12px 36px rgba(7,34,21,.08); }
+.roaster-background .membership-summary article { background: var(--roaster-panel); }
+.roaster-background .membership-filters .MuiOutlinedInput-root { background: rgba(255,255,255,.10); }
+:root[data-theme="dark"] .app-shell.roaster-background { --roaster-wash: rgba(7,21,12,.72); --roaster-panel: rgba(27,37,30,.92); }
+@media(max-width:600px) { .app-shell.roaster-background::before { background-position: 72% center; } }
+
+.viewer-welcome-brand { text-decoration: none; }
+.viewer-admin-message { color: var(--ink-2); font-size: 13px; line-height: 1.6; margin: 24px 0 18px; min-height: 42px; }
+.viewer-access-card .admin-login-error { color: #ffb6a5; }
+.admin-access-form { gap: 22px; padding-bottom: 6px; }
+.admin-access-form .MuiInputBase-root { color: #fffdf6; background: rgba(3,19,10,.14); border-radius: 13px; }
+.admin-access-form .MuiInputLabel-root { color: #dfe7dc; }
+.admin-access-form .MuiOutlinedInput-notchedOutline { border-color: rgba(255,255,255,.4); }
+.admin-access-form .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: rgba(255,255,255,.7); }
+.admin-access-form .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color: #d4f23a; }
+.admin-access-form .MuiInputLabel-root.Mui-focused { color: #d4f23a; }
+.admin-access-form .MuiInputLabel-root.Mui-error { color: #ffb6a5; }
+.admin-access-form .MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline { border-color: #ffb6a5; }
+
+/* Labels sit above controls, keeping every filter on the same baseline. */
+.membership-toolbar { align-items: flex-end; }
+.membership-filters, .member-payments-filters { align-items: flex-start; }
+.filter-bar { align-items: flex-end; }
+.roaster-background .MuiInputBase-input { color: var(--ink); font-weight: 600; }
+.admin-access-form .MuiInputBase-input { color: #fffdf6; font-weight: 600; }
+.viewer-access-card .MuiInputLabel-root { color: #f1f5eb; }
+.viewer-access-card .MuiInputLabel-root.Mui-focused { color: #d4f23a; }
+.viewer-access-card .MuiInputLabel-root.Mui-error { color: #ffb6a5; }
+.membership-toolbar .membership-filters { flex: 1 1 680px; min-width: 0; }
+.membership-toolbar .membership-filters > .MuiTextField-root { flex: 1 1 130px; width: auto; min-width: 120px; }
+.membership-toolbar .membership-filters > .MuiTextField-root:first-child { flex: 1.3 1 180px; min-width: 160px; max-width: 260px; }
+.member-payments-filters { flex: 1 1 420px; }
+.member-payments-filters > .MuiTextField-root { flex: 1 1 120px; width: auto; min-width: 110px; }
+@media(max-width:600px) { .membership-toolbar .membership-filters { flex-basis: 100%; } .membership-toolbar .membership-filters > .MuiTextField-root:first-child { max-width: none; min-width: 130px; } }
+
+/* Give member names stronger prominence without enlarging payment amounts. */
+.membership-table tbody th .text-link,
+.membership-table tbody .member-name-cell {
+  font-size: 1.125rem;
+  line-height: 1.45;
+  font-weight: 700;
+}
+.membership-directory tbody th .text-link { font-size: 1.25rem; }
+.member-name-heading.MuiDialogTitle-root { font-size: 1.75rem; line-height: 1.25; }
+@media (max-width: 600px) {
+  .membership-directory tbody th .text-link { font-size: 1.125rem; }
+  .member-name-heading.MuiDialogTitle-root { font-size: 1.5rem; }
+}
+
+.membership-member-cards.membership-viewer-cards { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: stretch; }
+ .member-dues-flip { color: #fff; --fine-card-fill: #0f766e; --fine-card-rule: rgba(255,255,255,.35); }
+.member-dues-back .member-dues-months { font-size: .95rem; line-height: 1.6; font-weight: 700; overflow-wrap: anywhere; }
+.member-dues-back .member-fine-card-balance { margin-top: auto; }
+@media (max-width: 600px) { .membership-member-cards.membership-viewer-cards { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
+.member-combined-cards { color: #fff; --fine-card-fill: #26332b; --fine-card-rule: rgba(255,255,255,.3); }
+.combined-card-symbols { display: flex; gap: 12px; align-self: center; }
+.combined-card-symbols i { display: block; width: 35px; height: 52px; border-radius: 5px; background: #facc15; transform: rotate(-12deg); box-shadow: 0 4px 10px #0003; }
+.combined-card-symbols i + i { background: #dc2626; transform: rotate(12deg); }
+.combined-cards-back { gap: 10px; }
+.combined-card-section { display: grid; gap: 4px; font-size: .75rem; line-height: 1.35; }
+.combined-card-section > strong { font-size: .9rem; }
+.combined-yellow > strong { color: #fde047; }
+.combined-red > strong { color: #fca5a5; }
+.combined-card-section + .combined-card-section { border-top: 1px solid var(--fine-card-rule); padding-top: 9px; }
+@media (max-width: 480px) { .member-dues-back > strong { font-size: .85rem; } .member-dues-back .member-dues-months { font-size: .8rem; line-height: 1.4; } .member-dues-back { gap: 9px; } }
+
+.member-combined-cards .member-fine-card-front {
+  background: linear-gradient(145deg, #facc15 0%, #facc15 49%, #fff3a3 49%, #fff3a3 50%, #7f1d1d 50%, #7f1d1d 52%, #c62828 52%, #c62828 100%);
+  border: 1px solid rgba(255,255,255,.35);
+}
+.member-combined-cards .member-fine-card-front > strong { color: #302300; }
+.member-combined-cards .member-fine-card-front > span { color: #fff; text-shadow: 0 1px 2px #0008; }
+
+/* Wide register tables scroll inside their panel, never the page. */
+.membership-page, .membership-panel, .member-payments, .dialog-form,
+.membership-toolbar, .membership-filters { min-width: 0; max-width: 100%; }
+.membership-table-scroll { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; isolation: isolate; }
+.membership-table-scroll:focus-visible { outline: 2px solid var(--link); outline-offset: -2px; }
+.membership-table:not(.membership-directory) { border-collapse: separate; border-spacing: 0; }
+.membership-table:not(.membership-directory) thead tr:first-child > th:first-child,
+.membership-table:not(.membership-directory) tbody > tr > th:first-child {
+ position: sticky; left: 0; background: var(--card); z-index: 2;
+ box-shadow: 5px 0 8px -7px rgba(0,0,0,.65);
+}
+.membership-table:not(.membership-directory) thead tr:first-child > th:first-child { background: var(--paper); z-index: 3; }
+.membership-table:not(.membership-directory) tbody > tr > th:first-child { width: 180px; min-width: 180px; max-width: 180px; overflow-wrap: anywhere; }
+.membership-table .membership-row-inactive > th:first-child { background: var(--inactive-fill); }
+.member-payments-table tbody > tr > th:first-child { width: 115px; min-width: 115px; max-width: 115px; }
+@media (max-width: 600px) {
+ .membership-table:not(.membership-directory) tbody > tr > th:first-child { width: 130px; min-width: 130px; max-width: 130px; }
+ .member-payments-table tbody > tr > th:first-child { width: 100px; min-width: 100px; max-width: 100px; }
+ .membership-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+
+/* League overview now contains only the table panel. */
+.overview-grid { grid-template-columns: minmax(0,1fr); }
+
+.league-leaders { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; padding: 24px; border-top: 1px solid var(--rule); }
+.league-leader { min-width: 0; padding: 20px; border: 1px solid var(--rule); border-top: 3px solid var(--link); border-radius: 14px; background: var(--paper); }
+.league-leader h3 { margin: 0 0 16px; font-size: 1rem; }
+.league-leader-teams { display: grid; gap: 8px; margin-bottom: 14px; }
+.league-leader-teams .text-link { text-align: left; font-size: 1.15rem; font-weight: 700; overflow-wrap: anywhere; }
+.league-leader > strong, .league-leader > small { display: block; }
+.league-leader > small { margin-top: 6px; color: var(--ink-2); }
+.league-leader-defending { border-top-color: #0f766e; }
+.league-leader-fair-play { border-top-color: #d97706; }
+.league-leaders-note { grid-column: 1 / -1; margin: 0; color: var(--ink-2); font-size: .75rem; line-height: 1.6; }
+@media (max-width: 700px) { .league-leaders { grid-template-columns: minmax(0,1fr); padding: 16px; } }
+
+@media (min-width: 901px) { .event-editor-unnamed { grid-template-columns: 22px minmax(110px,1.3fr) minmax(110px,1.3fr) minmax(100px,1fr) 75px 100px; } }
+@media (max-width: 900px) { .event-editor > .MuiTextField-root { grid-column: 2; min-width: 0; } }
+
+/* Let content wrap and shrink at the component boundary rather than widen the page. */
+#root, .app-shell, main, .page, .page > *, .league-navigation,
+.section-heading, .section-heading > *, .filter-bar, .filter-bar > *,
+.overview-grid > *, .team-summary-grid > *, .match-preview-grid > *,
+.fixture-grid > *, .broadcast-cards > *, .header-actions,
+.MuiDialog-paper, .MuiDialogContent-root, .MuiDialogContent-root > * {
+ min-width: 0;
+ max-width: 100%;
+}
+.page h1, .page h2, .page h3, .league-navigation h1,
+.MuiDialogTitle-root, .team-summary-grid dd, .fixture-team,
+.section-heading, .membership-records article > div {
+ overflow-wrap: anywhere;
+}
+.MuiTableContainer-root { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.MuiDialogContent-root .dialog-form { width: 100%; min-width: 0; }
+@media (max-width: 600px) {
+ .filter-bar, .section-heading, .membership-records article { flex-wrap: wrap; }
+ .filter-bar > .MuiFormControl-root, .filter-bar > .MuiInputBase-root { flex: 1 1 130px; width: auto; min-width: 0; max-width: 100%; }
+ .MuiDialogTitle-root { overflow-wrap: anywhere; }
+ .MuiDialogActions-root { flex-wrap: wrap; gap: 8px; }
+ .MuiDialogActions-root .MuiButton-root, .membership-buttons .MuiButton-root { white-space: normal; overflow-wrap: anywhere; }
+ .member-payments-filters > .MuiTextField-root { min-width: 0; flex-basis: 110px; }
+ .team-summary-grid dd .text-link { white-space: normal; }
+ .schedule-completeness-counts > span { white-space: normal; overflow-wrap: anywhere; }
+ .event-editor { min-width: 0; grid-template-columns: 20px minmax(0,1fr); }
+}
+
+.table-scroll-shell { width: 100%; min-width: 0; max-width: 100%; }
+.table-scroll-controls { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--rule); background: var(--paper); color: var(--ink-2); font-size: .75rem; }
+.table-scroll-controls button { display: grid; place-items: center; width: 36px; min-height: 36px; padding: 0; border: 1px solid var(--rule); border-radius: 50%; background: var(--card); color: var(--ink); font-size: 1.65rem; line-height: 1; }
+.table-scroll-controls button:disabled { opacity: .25; cursor: default; }
+.league-navigation .navigation-shell { min-width: 0; max-width: 100%; }
+.league-navigation .navigation-shell nav { min-width: 0; }
+
+/* Larger combined card statistics, with compact spacing on small screens. */
+.combined-cards-back { gap: 8px; }
+.combined-card-section { font-size: .875rem; line-height: 1.35; gap: 3px; }
+.combined-card-section > strong { font-size: 1.05rem; }
+.combined-card-section b { font-size: 1rem; }
+.combined-cards-back .member-fine-card-hint { font-size: .75rem; }
+@media (max-width: 480px) {
+ .combined-cards-back { padding: 16px 10px; gap: 7px; }
+ .combined-card-section { font-size: .84rem; line-height: 1.3; }
+ .combined-card-section > strong { font-size: 1rem; }
+ .combined-card-section b { font-size: .95rem; }
+ .combined-card-section + .combined-card-section { padding-top: 7px; }
+ .combined-cards-back .member-fine-card-hint { font-size: .68rem; }
+}
+
+/* Access screens must remain usable on small phones and with the keyboard open. */
+.viewer-welcome-page, .admin-login-page { min-width: 0; max-width: 100%; min-height: 100dvh; padding-inline: max(12px,env(safe-area-inset-left)); }
+.viewer-welcome-brand, .admin-login-brand { min-width: 0; max-width: 100%; flex-shrink: 0; }
+.viewer-welcome-brand > span { overflow-wrap: anywhere; }
+.viewer-access-card, .admin-login-panel { min-width: 0; max-width: 100%; flex-shrink: 0; }
+.viewer-access-content, .viewer-access-form, .viewer-pin-entry, .viewer-pin-slots { min-width: 0; max-width: 100%; }
+.viewer-access-footer { flex-wrap: wrap; }
+.viewer-idle-note { max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 480px) {
+ .viewer-welcome-page { padding-block: max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-bottom)); }
+ .viewer-access-content { padding: 22px 18px; }
+ .viewer-access-masthead, .viewer-access-footer { padding-inline: 18px; }
+ .viewer-pin-slots { gap: 6px; }
+ .viewer-pin-slots > span { height: 52px; min-width: 0; border-radius: 10px; }
+ .viewer-access-form .viewer-enter-button.MuiButton-root { white-space: normal; min-width: 0; padding-inline: 12px; }
+}
+@media (max-height: 700px) {
+ .viewer-welcome-page, .admin-login-page { justify-content: flex-start; padding-block: 12px; }
+ .viewer-welcome-brand { margin-bottom: 12px; font-size: 23px; gap: 9px; }
+ .viewer-welcome-brand img { width: 34px; height: 34px; }
+ .viewer-access-masthead { padding-block: 10px; }
+ .viewer-access-content { padding: 14px 18px; }
+ .viewer-welcome-kicker { display: none; }
+ .viewer-access-content h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; }
+ .viewer-access-content h1 br { display: none; }
+ .viewer-access-content h1 span { margin-left: .2em; }
+ .viewer-welcome-description { font-size: 12px; }
+ .viewer-access-destinations { margin: 10px 0 12px; }
+ .viewer-pin-label { margin-bottom: 8px; font-size: 12px; }
+ .viewer-pin-slots > span { height: 44px; }
+ .viewer-pin-feedback { min-height: 0; margin: 9px 0 12px; font-size: 11px; }
+ .viewer-access-form .viewer-enter-button.MuiButton-root { min-height: 44px; padding-block: 8px; }
+ .viewer-access-footer { padding-block: 11px; gap: 6px; }
+ .viewer-idle-note { margin-top: 12px; font-size: 10px; }
+ .admin-login-page { gap: 14px; }
+ .admin-login-panel { padding: 20px; margin-bottom: 12px; }
+}
+.admin-login-panel { max-width: min(100%,440px); }
+
+/* Bound intrinsic table/grid widths at each card and dialog, not just the page. */
+.membership-page, .membership-panel, .member-payments, .table-scroll-shell,
+.league-navigation, .panel { min-width: 0; max-width: 100%; contain: inline-size; }
+.table-scroll-shell > .membership-table-scroll { display: block; width: 100%; max-width: 100%; }
+.membership-panel > .MuiTabs-root, .MuiDialogContent-root .MuiTabs-root { min-width: 0; max-width: 100%; }
+.membership-panel .MuiTabs-scroller { min-width: 0; }
+.MuiDialog-paper { width: min(900px,calc(100vw - 32px)); }
+.MuiDialogContent-root { min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; }
+.MuiDialogContent-root .dialog-form > *, .member-payments-header > *,
+.membership-summary > *, .member-payment-totals > *, .membership-records article > * { min-width: 0; max-width: 100%; }
+.member-fine-card-back { overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+@media (max-width: 600px) {
+ .membership-page .membership-toolbar, .member-payments-header { width: 100%; }
+ .membership-toolbar .membership-filters > .MuiTextField-root { min-width: 0; max-width: 100%; }
+ .membership-records article { width: 100%; }
+ .membership-records article strong, .membership-records article span { overflow-wrap: anywhere; white-space: normal; }
+ .team-summary-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .MuiDialog-paper { margin: 12px; width: calc(100vw - 24px); max-width: calc(100vw - 24px); }
+ .MuiDialogContent-root { padding-inline: 16px; }
+}
+
+/* Flip cards may shrink inside the profile grid, including their rotated faces. */
+.membership-member-cards.membership-flip-cards {
+ width: 100%; min-width: 0; max-width: 100%;
+ grid-template-columns: repeat(2,minmax(0,1fr));
+}
+.membership-flip-cards > .member-fine-card,
+.member-fine-card-inner,
+.member-fine-card-front,
+.member-fine-card-back {
+ min-width: 0; max-width: 100%; box-sizing: border-box;
+}
+.membership-flip-cards > .member-fine-card { width: 100%; justify-self: center; }
+.member-fine-card-front, .member-fine-card-back { overflow-wrap: anywhere; }
+.member-fine-card-front > *, .member-fine-card-back > *, .combined-card-section > * { min-width: 0; max-width: 100%; }
+.member-fine-card-inner { border-radius: inherit; }
+@media (max-width: 360px) {
+ .membership-member-cards.membership-flip-cards { gap: 10px; }
+ .member-fine-card-front, .member-fine-card-back { padding-inline: 10px; }
+ .member-fine-card-front > strong { font-size: clamp(1.1rem,5.5vw,1.4rem); }
+}
+.membership-member-cards.membership-flip-cards { overflow: hidden; }
+
+.member-card-carousel { width: 100%; max-width: 420px; min-width: 0; margin-inline: auto; }
+.member-card-carousel-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.member-card-carousel-controls > span { min-width: 0; text-align: center; font-size: .85rem; font-weight: 700; overflow-wrap: anywhere; }
+.member-card-carousel-controls button { flex: 0 0 44px; width: 44px; height: 44px; border: 1px solid var(--rule); border-radius: 50%; background: var(--card); color: var(--ink); font-size: 1.8rem; line-height: 1; }
+.member-card-carousel-controls button:disabled { opacity: .25; cursor: default; }
+.member-card-carousel-track { display: flex; width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }
+.member-card-carousel-track::-webkit-scrollbar { display: none; }
+.member-card-carousel-slide { flex: 0 0 100%; min-width: 0; max-width: 100%; display: flex; justify-content: center; padding: 10px; scroll-snap-align: start; scroll-snap-stop: always; overflow: hidden; }
+.member-card-carousel-slide .member-fine-card { width: 100%; max-width: 320px; height: 360px; min-width: 0; }
+.member-card-carousel-slide .member-fine-card-front, .member-card-carousel-slide .member-fine-card-back { padding: 26px 22px; }
+.member-card-carousel-slide .member-fine-card-front > strong { font-size: 2rem; }
+.member-card-carousel-slide .combined-card-section { font-size: 1rem; line-height: 1.45; gap: 5px; }
+.member-card-carousel-slide .combined-card-section > strong { font-size: 1.2rem; }
+.member-card-carousel-slide .combined-card-section b { font-size: 1.1rem; }
+.member-card-carousel-slide .member-dues-months { font-size: 1.1rem; line-height: 1.5; }
+.member-card-carousel-slide .member-fine-card-balance strong { font-size: 1.4rem; }
+.member-card-carousel-hint { margin: 8px 0 0; text-align: center; font-size: .75rem; color: var(--ink-2); }
+@media (max-width: 360px) { .member-card-carousel-slide { padding-inline: 4px; } .member-card-carousel-slide .member-fine-card-front, .member-card-carousel-slide .member-fine-card-back { padding-inline: 18px; } }
+
+/* Player and match dialogs own their scrolling, including landscape phones. */
+.screen-fit-dialog .MuiDialog-container { min-width: 0; padding: 12px; }
+.screen-fit-dialog .MuiDialog-paper {
+ display: flex; flex-direction: column; min-width: 0; min-height: 0;
+ width: 100%; margin: 0; max-width: min(900px,100%);
+ max-height: calc(100dvh - 24px); overflow: hidden;
+}
+.screen-fit-dialog .MuiDialog-paperWidthSm { max-width: min(600px,100%); }
+.screen-fit-dialog .MuiDialogTitle-root { flex: 0 0 auto; min-width: 0; max-height: 25dvh; overflow: auto; overflow-wrap: anywhere; }
+.screen-fit-dialog .MuiDialogContent-root { flex: 1 1 auto; min-height: 0; min-width: 0; width: 100%; overflow: auto; overscroll-behavior: contain; }
+.screen-fit-dialog .MuiDialogActions-root { flex: 0 0 auto; max-height: 25dvh; overflow: auto; flex-wrap: wrap; }
+.screen-fit-dialog .dialog-form > *, .screen-fit-dialog .player-stat-cards,
+.screen-fit-dialog .match-dialog-title, .screen-fit-dialog .team-timeline,
+.screen-fit-dialog .public-roster, .screen-fit-dialog .score-inputs { min-width: 0; max-width: 100%; }
+.screen-fit-dialog .player-stat-cards { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.screen-fit-dialog .public-roster-player { min-width: 0; max-width: 100%; }
+.screen-fit-dialog .public-roster-player > span { min-width: 0; overflow-wrap: anywhere; }
+@media (max-width:600px) {
+ .screen-fit-dialog .MuiDialogTitle-root { padding: 16px; font-size: 1.4rem; }
+ .screen-fit-dialog .match-dialog-title { font-size: 1.6rem; line-height: 1.15; }
+ .screen-fit-dialog .MuiDialogContent-root { padding-inline: 16px; }
+ .screen-fit-dialog .MuiDialogActions-root { padding: 10px 16px; gap: 8px; }
+ .screen-fit-dialog .MuiTabs-root { width: 100%; min-width: 0; }
+ .screen-fit-dialog .MuiAlert-message { min-width: 0; overflow-wrap: anywhere; }
+}
+
+.member-card-carousel-controls button {
+ flex-basis: 48px; width: 48px; height: 48px; border: 2px solid var(--link);
+ background: var(--link); color: var(--card); font-size: 2.2rem; font-weight: 800;
+ box-shadow: 0 3px 10px rgba(0,0,0,.18);
+}
+.member-card-carousel-controls button:hover:not(:disabled) { filter: brightness(1.12); }
+.member-card-carousel-controls button:disabled { opacity: .5; background: transparent; color: var(--ink); border-color: var(--rule); box-shadow: none; }
+.member-card-carousel-controls button:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.member-payments-table.member-payments-viewer { min-width: 0; }
+.member-payments-viewer th, .member-payments-viewer td { padding-inline: 10px; }
+.membership-directory thead th:last-child { text-align: left; }
+.membership-directory tbody th { width: 100%; }

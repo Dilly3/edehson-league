@@ -1,4 +1,6 @@
 import type { Player, PlayerStats } from "./types";
+let adminCredential="";
+export function setAdminCredential(value:string){adminCredential=value;}
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -17,12 +19,14 @@ export async function api<T>(
     const headers = new Headers(options.headers);
     headers.set("Accept", "application/json");
     if (options.body) headers.set("Content-Type", "application/json");
-    if (token) headers.set("Authorization", `Bearer ${token}`);
+    const credential=token||adminCredential;
+    if (credential) headers.set("Authorization", `Bearer ${credential}`);
     const response = await fetch(`/api${path}`, {
       ...options,
       headers,
       signal: controller.signal,
       cache: "no-store",
+      credentials: "same-origin",
     });
     const text = await response.text();
     let body: Record<string, unknown> = {};
@@ -34,6 +38,7 @@ export async function api<T>(
         response.status,
       );
     }
+    if (response.status===401&&body.code==="viewer_auth_required"&&path!=="/viewer/session"&&typeof window!=="undefined") window.dispatchEvent(new Event("viewer-access-required"));
     if (!response.ok)
       throw new ApiError(
         typeof body.error === "string"
@@ -145,4 +150,9 @@ export function updateFixtureVenue(
     },
     token,
   );
+}
+
+export async function verifyAdminKey(key: string): Promise<void> {
+  const result = await api<{ authenticated: boolean }>("/admin/session", {method:"GET"}, key);
+  if (result.authenticated !== true) throw new Error("Admin authentication could not be verified.");
 }

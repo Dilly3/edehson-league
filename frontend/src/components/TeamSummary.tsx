@@ -1,7 +1,7 @@
 import type { PlayerStats, Standing } from "../types";
 import { teamSeasonSummary } from "../football";
 
-export default function TeamSummary({ teamTag, standings, stats, onPlayerClick }: {
+export default function TeamSummary({ teamTag, standings, stats }: {
   teamTag: string;
   standings: Standing[] | null;
   stats: PlayerStats[] | null;
@@ -16,16 +16,11 @@ export default function TeamSummary({ teamTag, standings, stats, onPlayerClick }
         <dd>{standings === null ? "Unavailable" : standing ? `#${standing.position}` : "Not ranked"}</dd>
         {standing && <small>{standing.points} points · {standing.played} played</small>}
       </div>
-      <div className="team-summary-scorers">
-        <dt>{summary && summary.scorers.length > 1 ? "Joint top scorers" : "Top scorer"}</dt>
-        <dd>{!summary ? "Unavailable" : summary.scorers.length ? <>
-          {summary.scorers.map(player => <button className="text-link" key={player.player_id} onClick={() => onPlayerClick(player)}>{player.name}</button>)}
-        </> : "No goals yet"}</dd>
-        {summary && summary.goals > 0 && <small>{summary.goals} {summary.goals === 1 ? "goal" : "goals"}{summary.scorers.length > 1 ? " each" : ""}</small>}
-      </div>
+      <div><dt>Goals scored</dt><dd>{standing?.goals_for ?? "Unavailable"}</dd></div>
+      <div><dt>Goals conceded</dt><dd>{standing?.goals_against ?? "Unavailable"}</dd></div>
       <div><dt>Yellow cards</dt><dd>{summary?.yellowCards ?? "Unavailable"}</dd></div>
       <div><dt>Red cards</dt><dd>{summary?.redCards ?? "Unavailable"}</dd></div>
     </dl>
-    <p>Full-time matches only · Own goals excluded from scorer totals.</p>
+    <p>Full-time matches only.</p>
   </section>;
 }

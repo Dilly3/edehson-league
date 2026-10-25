@@ -69,9 +69,25 @@ function buildTheme(dark: boolean) { return createTheme({
       },
     },
     MuiTextField: { defaultProps: { size: "small", fullWidth: true } },
+    MuiInputLabel: {
+      defaultProps: { shrink: true },
+      styleOverrides: { root: {
+        position: "relative", transform: "none", transformOrigin: "top left",
+        maxWidth: "100%", marginBottom: 7, minHeight: 19,
+        fontSize: "0.8125rem", lineHeight: 1.45, fontWeight: 600,
+        whiteSpace: "normal", overflow: "visible", pointerEvents: "auto",
+        color: dark ? "#dfe7dc" : "#253d30",
+        "&.MuiInputLabel-shrink": { transform: "none", maxWidth: "100%" },
+      } },
+    },
     MuiOutlinedInput: {
+      defaultProps: { notched: false },
       styleOverrides: {
-        root: { background: dark ? "#162019" : "#fffdf8" },
+        root: {
+          background: dark ? "rgba(8,24,14,.18)" : "rgba(255,253,248,.24)",
+          color: dark ? "#f8faf5" : "#14251a", minHeight: 44,
+          borderRadius: 10, fontSize: "1rem", fontWeight: 500,
+        },
         notchedOutline: { borderColor: dark ? "#697a6d" : "#b9b3a3" },
       },
     },

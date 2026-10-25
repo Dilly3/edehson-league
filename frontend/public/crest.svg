@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">RealEdehsons League football</title>
+  <desc id="desc">A white football with deep-green panels and sweeping green strips.</desc>
+  <defs>
+    <clipPath id="ball"><circle cx="32" cy="32" r="29"/></clipPath>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="#fffdf8"/>
+  <g clip-path="url(#ball)">
+    <circle cx="32" cy="32" r="29" fill="#fffdf8"/>
+    <!-- Five broad green strips give the white football its own panel pattern. -->
+    <g fill="#126442">
+      <path d="m32 19 13 9-5 15H24l-5-15Z"/>
+      <path d="M24 1h16l-3 10H27Z"/>
+      <path d="m60 15 8 14-11 5-5-9Z"/>
+      <path d="m57 52-12 13-7-10 7-8Z"/>
+      <path d="M8 52 20 65l7-10-8-8Z"/>
+      <path d="m4 15-8 14 11 5 5-9Z"/>
+    </g>
+    <g fill="none" stroke="#126442" stroke-width="3.5" stroke-linecap="round">
+      <path d="M32 19V9M45 28l12-4M40 43l6 10M24 43l-6 10M19 28 7 24"/>
+    </g>
+    <path d="M8 17C18 5 36 1 48 11" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
+  </g>
+  <circle cx="32" cy="32" r="29" fill="none" stroke="#0d3b2a" stroke-width="1.7"/>
+</svg>

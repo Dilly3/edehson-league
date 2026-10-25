@@ -39,8 +39,11 @@ describe("result editor", () => {
       ),
     ).toEqual({ home: 1, away: 1 });
   });
-  it("requires every event to have a player", () => {
-    expect(validateEvents([e("", "goal", 10)])).toContain("select a player");
+  it("requires players for cards and a team for unnamed goals", () => {
+    expect(validateEvents([e("", "yellow_card", 10)])).toContain("select a player");
+    expect(validateEvents([e("", "red_card", 10)])).toContain("select a player");
+    expect(validateEvents([e("", "goal", 10)])).toContain("select a team");
+    expect(validateEvents([{...e("", "goal", 10),team_tag:"EDL001"}])).toBeNull();
   });
   it("accepts two yellow-card events without inferring a dismissal", () => {
     expect(
@@ -194,4 +197,8 @@ describe("match event team labels", () => {
     expect(eventTeamLabel("Manchester United", "  ")).toBe("Manchester United");
     expect(eventTeamLabel("Team A")).toBe("Team A");
   });
+});
+
+it("scores unnamed goals and own goals for the correct side",()=>{
+ expect(scoreEvents(fixture,[{...e("","goal",1),team_tag:"EDL001"},{...e("","own_goal",2),team_tag:"EDL001"}],rosters)).toEqual({home:1,away:1});
 });
