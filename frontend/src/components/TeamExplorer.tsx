@@ -39,7 +39,7 @@ export default function TeamExplorer({ selection, standings, seasonStats, onClos
   }, [selection, player, attempt]);
   const current = player ? stats.find(s => s.player_id === player.id) : undefined;
   return (
-    <Dialog open onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog className="screen-fit-dialog" open onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{player ? player.name : `${"teamName" in selection ? selection.teamName : "Team"} roster`}</DialogTitle>
       <DialogContent>
         {!player && "teamTag" in selection && <>
@@ -53,11 +53,10 @@ export default function TeamExplorer({ selection, standings, seasonStats, onClos
           {current ? <>
             <p className="muted small">Season totals · Finalized matches only</p>
             <dl className="player-stat-cards">
-              {([["Goals", current.goals], ["Yellow cards", current.yellow_cards], ["Red cards", current.red_cards], ["Own goals", current.own_goals]] as const).map(([label, value]) => (
+              {([["Yellow cards", current.yellow_cards], ["Red cards", current.red_cards]] as const).map(([label, value]) => (
                 <div key={label}><dt>{label}</dt><dd>{value ?? "Unavailable"}</dd></div>
               ))}
             </dl>
-            <p className="muted small">Own goals count towards the opposing team’s score.</p>
           </> : <Alert severity="info">No statistics are available for this player yet.</Alert>}
         </> : roster.length ? <div className="public-roster">
           {roster.map(p => <button key={p.id} className="public-roster-player" onClick={() => setPlayer({ id: p.id, name: p.name, jersey_number: p.jersey_number, team: "teamName" in selection ? selection.teamName : p.team })}>

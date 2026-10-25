@@ -1,3 +1,4 @@
+import ScrollTable from "./ScrollTable";
 import { teamInitials } from "../football";
 import type { ReactNode } from "react";
 import {
@@ -5,7 +6,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
 } from "@mui/material";
@@ -101,7 +101,7 @@ export function LeagueTable({
       />
     );
   return (
-    <TableContainer>
+    <ScrollTable>
       <Table size="small" aria-label="League standings" className="league-table">
         <TableHead>
           <TableRow>
@@ -184,6 +184,6 @@ export function LeagueTable({
           ))}
         </TableBody>
       </Table>
-    </TableContainer>
+    </ScrollTable>
   );
 }

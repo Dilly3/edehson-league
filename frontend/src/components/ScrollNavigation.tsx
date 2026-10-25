@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import ChevronLeftRounded from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRounded from "@mui/icons-material/ChevronRightRounded";
 
-export default function ScrollNavigation({ children }: { children: ReactNode }) {
+export default function ScrollNavigation({ children, id="main-navigation", label="Main navigation" }: { children: ReactNode; id?:string; label?:string }) {
   const ref = useRef<HTMLElement>(null);
   const [edges, setEdges] = useState({ left: false, right: false });
 
@@ -48,12 +48,12 @@ export default function ScrollNavigation({ children }: { children: ReactNode }) 
   return (
     <div className="navigation-shell">
       <button type="button" className="navigation-arrow" disabled={!edges.left}
-        aria-label="Scroll menu left" aria-controls="main-navigation" onClick={() => scroll(-1)}>
+        aria-label="Scroll menu left" aria-controls={id} onClick={() => scroll(-1)}>
         <ChevronLeftRounded />
       </button>
-      <nav ref={ref} id="main-navigation" aria-label="Main navigation">{children}</nav>
+      <nav ref={ref} id={id} aria-label={label}>{children}</nav>
       <button type="button" className="navigation-arrow" disabled={!edges.right}
-        aria-label="Scroll menu right" aria-controls="main-navigation" onClick={() => scroll(1)}>
+        aria-label="Scroll menu right" aria-controls={id} onClick={() => scroll(1)}>
         <ChevronRightRounded />
       </button>
     </div>
