@@ -216,7 +216,7 @@ func TestValidateResult(t *testing.T) {
 					t.Errorf("event %d: incorrect fixture ID", i+1)
 				}
 
-				if saved.PlayerID != source.PlayerID {
+				if saved.PlayerID == nil || *saved.PlayerID != source.PlayerID {
 					t.Errorf("event %d: incorrect player ID", i+1)
 				}
 
@@ -290,4 +290,42 @@ func TestValidateResult(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestOptionalScorers(t *testing.T) {
+	fixture := models.Fixture{HomeTeamTag: "EDL001", AwayTeamTag: "EDL002"}
+	player := "11111111-1111-4111-8111-111111111111"
+	roster := map[string]string{player: "EDL001"}
+	one, zero, revision := 1, 0, 0
+	input := resultInput{HomeScore: &one, AwayScore: &one, Revision: &revision, Events: []eventInput{{Type: models.EventGoal, TeamTag: "EDL001"}, {Type: models.EventOwnGoal, TeamTag: "EDL001"}}}
+	events, err := validateResult(fixture, input, roster)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, event := range events {
+		if event.PlayerID != nil || event.TeamTag != "EDL001" {
+			t.Fatal("unnamed goal assigned to a player or wrong team")
+		}
+	}
+	for _, kind := range []string{models.EventYellowCard, models.EventRedCard} {
+		input.HomeScore = &zero
+		input.AwayScore = &zero
+		input.Events = []eventInput{{Type: kind, TeamTag: "EDL001"}}
+		if _, err := validateResult(fixture, input, roster); err == nil {
+			t.Fatal("unnamed card accepted")
+		}
+	}
+	input.HomeScore = &one
+	input.Events = []eventInput{{Type: models.EventGoal, TeamTag: "OTHER"}}
+	if _, err := validateResult(fixture, input, roster); err == nil {
+		t.Fatal("nonparticipating team accepted")
+	}
+	input.Events = []eventInput{{Type: models.EventGoal, TeamTag: "EDL002", PlayerID: player}}
+	if _, err := validateResult(fixture, input, roster); err == nil {
+		t.Fatal("mismatched player team accepted")
+	}
+	input.Events = []eventInput{{Type: models.EventGoal, TeamTag: "EDL001"}, {Type: models.EventGoal, TeamTag: "EDL001"}}
+	if _, err := validateResult(fixture, input, roster); err == nil {
+		t.Fatal("score mismatch accepted")
+	}
 }
