@@ -1,10 +1,17 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/dilly3/edehson-league/membership"
+	"github.com/dilly3/edehson-league/vieweraccess"
+	"github.com/gin-gonic/gin"
+)
 
 func ConnectRouter(s *Server) *gin.Engine {
 	router := gin.Default()
+	router.Use(vieweraccess.Middleware(s.GetDB(), s.GetAdminToken()))
 	api := router.Group("/api")
+	vieweraccess.Register(api, s.GetDB(), s.requireAdmin(s.GetAdminToken()))
+	membership.Register(api, s.GetDB(), s.requireAdmin(s.GetAdminToken()))
 
 	api.GET("/health", s.Health)
 	api.GET("/ready", s.Ready)

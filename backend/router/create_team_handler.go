@@ -15,8 +15,9 @@ import (
 
 func (s *Server) CreateTeam(c *gin.Context) {
 	var input struct {
-		Name string `json:"name" binding:"required"`
-		Tag  string `json:"tag" binding:"required"`
+		DisplayName *string `json:"display_name"`
+		Name        string  `json:"name" binding:"required"`
+		Tag         string  `json:"tag" binding:"required"`
 	}
 
 	c.Request.Body = http.MaxBytesReader(
@@ -51,9 +52,14 @@ func (s *Server) CreateTeam(c *gin.Context) {
 		return
 	}
 
-	team := models.Team{Name: name, Tag: strings.ToUpper(tag)}
+	displayName, err := normalizeTeamDisplayName(input.DisplayName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	team := models.Team{DisplayName: displayName, Name: name, Tag: strings.ToUpper(tag)}
 
-	err := s.GetDB().WithContext(c.Request.Context()).
+	err = s.GetDB().WithContext(c.Request.Context()).
 		Create(&team).Error
 
 	if errors.Is(err, gorm.ErrDuplicatedKey) {

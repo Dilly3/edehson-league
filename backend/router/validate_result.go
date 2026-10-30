@@ -16,6 +16,7 @@ type resultInput struct {
 }
 
 type eventInput struct {
+	TeamTag  string `json:"team_tag"`
 	PlayerID string `json:"player_id"`
 	Type     string `json:"type"`
 	Minute   *int   `json:"minute"`
@@ -54,24 +55,31 @@ func validateResult(
 	for index, event := range input.Events {
 		position := index + 1
 
-		playerID, err := uuid.Parse(event.PlayerID)
-		if err != nil {
-			return nil, fmt.Errorf(
-				"event %d: invalid player ID",
-				position,
-			)
-		}
-
-		id := playerID.String()
-		teamTag, exists := roster[id]
-
-		if !exists ||
-			(teamTag != fixture.HomeTeamTag &&
-				teamTag != fixture.AwayTeamTag) {
-			return nil, fmt.Errorf(
-				"event %d: player must belong to a participating team",
-				position,
-			)
+		id, teamTag := "", event.TeamTag
+		var playerRef *string
+		if event.PlayerID == "" {
+			if event.Type != models.EventGoal && event.Type != models.EventOwnGoal {
+				return nil, fmt.Errorf("event %d: a player is required for card events", position)
+			}
+			if teamTag != fixture.HomeTeamTag && teamTag != fixture.AwayTeamTag {
+				return nil, fmt.Errorf("event %d: select a participating team for an unnamed goal", position)
+			}
+		} else {
+			playerID, err := uuid.Parse(event.PlayerID)
+			if err != nil {
+				return nil, fmt.Errorf("event %d: invalid player ID", position)
+			}
+			id = playerID.String()
+			var exists bool
+			playerTeam, exists := roster[id]
+			if !exists || (playerTeam != fixture.HomeTeamTag && playerTeam != fixture.AwayTeamTag) {
+				return nil, fmt.Errorf("event %d: player must belong to a participating team", position)
+			}
+			if teamTag != "" && teamTag != playerTeam {
+				return nil, fmt.Errorf("event %d: player and team do not match", position)
+			}
+			teamTag = playerTeam
+			playerRef = &id
 		}
 
 		if event.Minute != nil {
@@ -139,7 +147,7 @@ func validateResult(
 
 		events = append(events, models.MatchEvent{
 			FixtureID: fixture.ID,
-			PlayerID:  id,
+			PlayerID:  playerRef,
 			TeamTag:   teamTag,
 			Type:      event.Type,
 			Minute:    event.Minute,

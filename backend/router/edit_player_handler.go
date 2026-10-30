@@ -2,12 +2,12 @@ package router
 
 import (
 	"errors"
+	"github.com/google/uuid"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"unicode/utf8"
-	"uuid"
 
 	"github.com/dilly3/edehson-league/models"
 	"github.com/gin-gonic/gin"
