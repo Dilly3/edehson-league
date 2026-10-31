@@ -1,6 +1,7 @@
 package router
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/google/uuid"
 	"log"
@@ -23,7 +24,7 @@ func (s *Server) EditFixture(c *gin.Context) {
 	}
 
 	// A map lets us distinguish an omitted field from explicit null.
-	var input map[string]*time.Time
+	var input map[string]json.RawMessage
 
 	c.Request.Body = http.MaxBytesReader(
 		c.Writer,
@@ -31,17 +32,44 @@ func (s *Server) EditFixture(c *gin.Context) {
 		4096,
 	)
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	badInput := func() {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Provide kickoff_at as an RFC3339 timestamp or null",
 		})
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		badInput()
 		return
 	}
 
-	kickoff, exists := input["kickoff_at"]
-	if !exists || len(input) != 1 {
+	rawKickoff, exists := input["kickoff_at"]
+	if !exists {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Provide only the kickoff_at field",
+			"error": "Provide the kickoff_at field",
+		})
+		return
+	}
+	var kickoff *time.Time
+	if err := json.Unmarshal(rawKickoff, &kickoff); err != nil {
+		badInput()
+		return
+	}
+
+	moveMatchday := false
+	expectedKeys := 1
+	if raw, ok := input["move_matchday"]; ok {
+		expectedKeys++
+		if err := json.Unmarshal(raw, &moveMatchday); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "move_matchday must be true or false",
+			})
+			return
+		}
+	}
+	if len(input) != expectedKeys {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Provide only kickoff_at and optionally move_matchday",
 		})
 		return
 	}
@@ -53,6 +81,7 @@ func (s *Server) EditFixture(c *gin.Context) {
 
 	var updated models.Fixture
 	errFinalized := errors.New("finalized fixture cannot be rescheduled")
+	var shifted []models.Fixture
 
 	err = s.GetDB().WithContext(c.Request.Context()).Transaction(
 		func(tx *gorm.DB) error {
@@ -72,11 +101,25 @@ func (s *Server) EditFixture(c *gin.Context) {
 			}
 
 			var others []models.Fixture
-			if kickoff != nil {
+			if kickoff != nil || moveMatchday {
 				if err := tx.Where("id <> ?", updated.ID).Find(&others).Error; err != nil {
 					return err
 				}
+				if moveMatchday {
+					shifted = shiftMatchday(updated, kickoff, others)
+				}
 				if err := validateFixtureDate(updated, kickoff, others); err != nil {
+					return err
+				}
+			}
+
+			for _, sibling := range shifted {
+				if err := tx.Model(&models.Fixture{}).
+					Where("id = ?", sibling.ID).
+					Updates(map[string]interface{}{
+						"kickoff_at": sibling.KickoffAt,
+						"revision":   gorm.Expr("revision + 1"),
+					}).Error; err != nil {
 					return err
 				}
 			}
@@ -124,4 +167,32 @@ func (s *Server) EditFixture(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": updated})
+}
+
+// shiftMatchday moves unplayed games with a kickoff in the same matchday onto
+// the new WAT date, keeping each game's own time of day, or clears them when kickoff is nil. It updates others in place
+// and returns the changed fixtures.
+func shiftMatchday(fixture models.Fixture, kickoff *time.Time, others []models.Fixture) []models.Fixture {
+	var changed []models.Fixture
+	for i := range others {
+		o := &others[i]
+		if o.Matchday != fixture.Matchday || o.KickoffAt == nil {
+			continue
+		}
+		if o.Status != "scheduled" && o.Status != "postponed" {
+			continue
+		}
+		if kickoff == nil {
+			o.KickoffAt = nil
+			changed = append(changed, *o)
+			continue
+		}
+		target := kickoff.In(leagueTimezone)
+		local := o.KickoffAt.In(leagueTimezone)
+		moved := time.Date(target.Year(), target.Month(), target.Day(),
+			local.Hour(), local.Minute(), local.Second(), local.Nanosecond(), leagueTimezone).UTC()
+		o.KickoffAt = &moved
+		changed = append(changed, *o)
+	}
+	return changed
 }

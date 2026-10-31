@@ -3,10 +3,12 @@ import {
   Alert,
   Button,
   CircularProgress,
+  Checkbox,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   IconButton,
   MenuItem,
   Tab,
@@ -69,6 +71,7 @@ export default function FixtureDialog({
     [score, setScore] = useState({ home: 0, away: 0 }),
     [publishStatus, setPublishStatus] = useState("live"),
     [kickoff, setKickoff] = useState(""),
+    [moveMatchday, setMoveMatchday] = useState(true),
     [broadcast, setBroadcast] = useState(false),
     [venue, setVenue] = useState(""),
     [tab, setTab] = useState(initialWatch ? 5 : 0),
@@ -172,7 +175,7 @@ export default function FixtureDialog({
           `/fixtures/${fixture.id}/kickoff`,
           {
             method: "PATCH",
-            body: JSON.stringify({ kickoff_at: kickoffFromInput(kickoff) }),
+            body: JSON.stringify({ kickoff_at: kickoffFromInput(kickoff), move_matchday: moveMatchday }),
           },
           token,
         );
@@ -264,10 +267,34 @@ export default function FixtureDialog({
                       <small>Away</small>
                     </div>
                   </div>
-                  <p className="match-meta">
-                    {matchStatusLabel(current.status)}{" "}
-                    · {formatKickoff(current.kickoff_at)} · WAT
-                  </p>
+                  <div className="match-meta">
+                    <span>
+                      {matchStatusLabel(current.status)} ·{" "}
+                      {formatKickoff(current.kickoff_at)} · WAT
+                    </span>
+                    {token && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => setTab(2)}
+                        disabled={
+                          busy ||
+                          ["live", "half_time", "finalized"].includes(
+                            current.status,
+                          )
+                        }
+                        title={
+                          ["live", "half_time", "finalized"].includes(
+                            current.status,
+                          )
+                            ? "Kickoff cannot be changed after a match starts"
+                            : undefined
+                        }
+                      >
+                        Edit kickoff
+                      </Button>
+                    )}
+                  </div>
                   <p className="match-venue">
                     {current.venue || "Venue to be confirmed"}
                   </p>
@@ -290,7 +317,7 @@ export default function FixtureDialog({
                     )}{" "}
                     {token && (
                       <Tab
-                        label="Kickoff"
+                        label="Edit kickoff"
                         disabled={["live", "half_time", "finalized"].includes(current.status)}
                       />
                     )}
@@ -537,11 +564,18 @@ export default function FixtureDialog({
                         onChange={(e) => setKickoff(e.target.value)}
                         slotProps={{ inputLabel: { shrink: true } }}
                       />
+                      <FormControlLabel
+                        control={<Checkbox checked={moveMatchday} onChange={(e) => setMoveMatchday(e.target.checked)} />}
+                        label={`Apply to the whole of matchday ${current.matchday}`}
+                      />
                       <p className="muted">
                         All kickoff times use Nigeria / WAT (UTC+01:00). Games
                         in one matchday must share a date, and a date cannot be
-                        shared by different matchdays. Leave this empty to clear
-                        the kickoff. Conflicting dates will be rejected.
+                        shared by different matchdays. With the box ticked, the
+                        other unplayed games in this matchday move to the same
+                        date and keep their own kickoff times. Leave the field
+                        empty to clear the kickoff (and the whole matchday's
+                        unplayed dates when ticked).
                       </p>
                     </>
                   )}
