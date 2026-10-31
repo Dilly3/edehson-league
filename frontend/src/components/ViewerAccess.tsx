@@ -4,7 +4,9 @@ import { api, ApiError, message } from "../api";
 import { createViewerIdleTimer, VIEWER_IDLE_MS } from "../viewerSession";
 import { isAdminPath } from "../navigation";
 
+const VIEWER_LOGIN_REQUIRED=false;
 export function ViewerGate({children}:{children:ReactNode}) {
+ if(!VIEWER_LOGIN_REQUIRED)return <>{children}</>;
  const admin=isAdminPath(window.location.pathname);
  const [state,setState]=useState<"checking"|"locked"|"open"|"error">("checking");
  const [error,setError]=useState("");

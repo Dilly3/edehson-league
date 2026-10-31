@@ -25,14 +25,14 @@ func TestPINFormat(t *testing.T) {
 		}
 	}
 }
-func TestUnauthenticatedMiddleware(t *testing.T) {
+func TestPublicMiddleware(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
 	r.Use(Middleware(nil, "test-admin-key"))
 	r.GET("/api/teams", func(c *gin.Context) { c.Status(200) })
 	w := httptest.NewRecorder()
 	r.ServeHTTP(w, httptest.NewRequest("GET", "/api/teams", nil))
-	if w.Code != 401 {
+	if w.Code != 200 {
 		t.Fatal(w.Code)
 	}
 }

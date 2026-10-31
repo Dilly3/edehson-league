@@ -336,7 +336,7 @@ export default function App() {
             {adminArea && <a href="/admin" className={page === "admin" ? "nav-item active" : "nav-item"} aria-current={page === "admin" ? "page" : undefined} onClick={event => { event.preventDefault(); navigate("admin"); }}>Dashboard</a>}
           </ScrollNavigation>
           <div className="header-actions">
-            {!adminArea&&<Button className="viewer-logout" variant="outlined" color="inherit" startIcon={<LogoutRounded />} onClick={()=>void logoutViewer().catch(e=>setToast(message(e)))}>Log out</Button>}
+            
             <Tooltip title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
               <IconButton className="theme-toggle" onClick={toggle} aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"} aria-pressed={mode === "dark"}>
                 {mode === "dark" ? <LightModeOutlined /> : <DarkModeOutlined />}

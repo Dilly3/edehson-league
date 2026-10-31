@@ -142,24 +142,6 @@ func Middleware(db *gorm.DB, adminKey string) gin.HandlerFunc {
 			return
 		}
 		c.Header("Cache-Control", "no-store")
-		switch c.Request.URL.Path {
-		case "/api/health", "/api/ready", "/api/admin/session", "/api/viewer/login", "/api/viewer/session", "/api/viewer/logout":
-			c.Next()
-			return
-		}
-		if adminValid(c, adminKey) {
-			c.Next()
-			return
-		}
-		ok, err := sessionValid(db, c)
-		if err != nil {
-			serverError(c)
-			return
-		}
-		if !ok {
-			authError(c)
-			return
-		}
 		c.Next()
 	}
 }
