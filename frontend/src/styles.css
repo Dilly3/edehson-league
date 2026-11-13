@@ -1192,23 +1192,23 @@ h1 {
   gap: 8px 24px;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 22px var(--gutter);
-  font-size: 14px;
+  padding: 14px var(--gutter);
+  font-size: 12px;
 }
 .footer-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   font-family: var(--display);
   font-weight: 700;
-  font-size: 17px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #fff;
 }
 .footer-brand img {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
 }
 
@@ -1691,12 +1691,12 @@ h1 {
 .footer-partners {
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 28px var(--gutter) 20px;
+  padding: 20px var(--gutter) 14px;
 }
 .footer-partners h2 {
-  margin: 0 0 14px;
+  margin: 0 0 8px;
   font-family: var(--display);
-  font-size: 20px;
+  font-size: 15px;
   letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--volt);
@@ -1704,15 +1704,15 @@ h1 {
 .footer-partners ul {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 32px;
+  gap: 8px 24px;
   list-style: none;
   margin: 0;
-  padding: 0 0 20px;
+  padding: 0 0 14px;
   border-bottom: 1px solid rgba(255,255,255,.18);
 }
-.footer-partners li { font-size: 16px; font-weight: 600; color: #fff; }
+.footer-partners li { font-size: 13px; font-weight: 600; color: #fff; }
 @media (max-width: 700px) {
-  .footer-partners ul { flex-direction: column; gap: 12px; }
+  .footer-partners ul { flex-direction: column; gap: 8px; }
 }
 
 .fx-status.live { color: #a52e22; background: #fff0ed; border: 1px solid #f0b4a9; padding: 2px 5px; }
@@ -2336,3 +2336,98 @@ h1 {
 .member-payments-viewer th, .member-payments-viewer td { padding-inline: 10px; }
 .membership-directory thead th:last-child { text-align: left; }
 .membership-directory tbody th { width: 100%; }
+
+/* League bottom navigation: sticky icon bar replacing the scrollable league tabs. */
+.app-shell.has-bottom-nav { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+.bottom-nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1100;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  padding: 6px max(8px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-top: 1px solid var(--rule);
+  box-shadow: 0 -4px 18px rgba(0,0,0,.08);
+}
+.bottom-nav-item {
+  appearance: none; border: 0; background: none; padding: 0; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  min-width: 0; min-height: 56px; border-radius: 14px;
+  color: var(--ink-3); text-decoration: none;
+  font-family: var(--body); font-size: 11px; font-weight: 700; letter-spacing: .02em;
+  transition: color .15s, background .15s;
+}
+.bottom-nav-icon { display: grid; place-items: center; width: 52px; height: 28px; border-radius: 14px; transition: background .15s; }
+.bottom-nav-icon svg { font-size: 22px; }
+.bottom-nav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bottom-nav-item:hover { color: var(--ink); }
+.bottom-nav-item.active { color: var(--pitch); }
+.bottom-nav-item.active .bottom-nav-icon { background: var(--volt); color: var(--pitch); }
+.bottom-nav-item:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+:root[data-theme="dark"] .bottom-nav-item.active { color: var(--volt); }
+:root[data-theme="dark"] .bottom-nav { box-shadow: 0 -4px 18px rgba(0,0,0,.4); }
+@media (min-width: 900px) {
+  .bottom-nav { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); border: 1px solid var(--rule); border-radius: 22px; padding: 6px; }
+  .app-shell.has-bottom-nav { padding-bottom: 96px; }
+}
+@media (prefers-reduced-motion: reduce) { .bottom-nav-item, .bottom-nav-icon { transition: none; } }
+
+/* Smaller headings on the league pages. */
+.league-pages .league-navigation h1 { font-size: clamp(1.15rem, 3vw, 1.5rem); margin-bottom: 8px; }
+.league-pages .page-title { margin-bottom: 22px; padding-bottom: 14px; }
+.league-pages .page-title h1 { font-size: clamp(28px, 4.5vw, 44px); line-height: 0.95; }
+.league-pages .page-title p { margin-top: 8px; font-size: 15px; }
+.league-pages .section-heading h2 { font-size: clamp(20px, 2.4vw, 26px); }
+
+/* Payments filters: aligned grid; year + month share one period picker. */
+.membership-toolbar .membership-filters.is-payments {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px; align-items: start; width: 100%; flex: 1 1 100%;
+}
+.membership-toolbar .membership-filters.is-payments > .MuiTextField-root:nth-child(n) { width: auto; min-width: 0; max-width: none; margin: 0; }
+@media (max-width: 600px) {
+  .membership-toolbar .membership-filters.is-payments { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .membership-toolbar .membership-filters.is-payments > :first-child,
+  .membership-toolbar .membership-filters.is-payments > :last-child:nth-child(even) { grid-column: 1 / -1; }
+}
+.period-picker { width: 260px; padding: 10px; border-radius: 14px !important; }
+.period-picker-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.period-picker-head strong { font-family: var(--display); font-size: 18px; letter-spacing: .04em; }
+.period-picker .period-all { margin-bottom: 8px; border-radius: 10px; font-weight: 700; text-transform: none; }
+.period-picker .period-all.selected { background: var(--pitch); color: #fff; }
+.period-picker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.period-picker-grid button {
+  appearance: none; border: 1px solid var(--rule); background: transparent; color: inherit;
+  min-height: 40px; border-radius: 10px; font: inherit; font-weight: 600; cursor: pointer;
+}
+.period-picker-grid button:hover { background: var(--rule-soft); }
+.period-picker-grid button.selected { background: var(--pitch); border-color: var(--pitch); color: #fff; }
+.period-picker-grid button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+:root[data-theme="dark"] .period-picker-grid button.selected,
+:root[data-theme="dark"] .period-picker .period-all.selected { background: var(--volt); border-color: var(--volt); color: var(--pitch); }
+
+/* Header icon navigation (Roaster / League / Dashboard): its own row under the brand, inside the sticky header. */
+.site-header-inner { flex-wrap: wrap; align-items: center; gap: 0 12px; min-height: 0; }
+.site-header .brand { order: 1; padding-block: 10px 6px; }
+.site-header .header-actions { order: 2; margin-left: auto; }
+.header-nav {
+  order: 3; flex: 1 0 100%; min-width: 0;
+  display: flex; justify-content: center; align-items: center; gap: 6px;
+  padding-bottom: 10px;
+}
+.header-nav-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 38px; padding: 0 14px; border-radius: 19px;
+  color: rgba(255,255,255,.78); text-decoration: none;
+  font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: .06em; text-transform: uppercase;
+  transition: color .15s, background .15s;
+}
+.header-nav-icon { display: grid; place-items: center; }
+.header-nav-icon svg { font-size: 20px; }
+.header-nav-item:hover { color: #fff; background: rgba(255,255,255,.1); }
+.header-nav-item.active { background: var(--volt); color: var(--pitch); }
+.header-nav-item:focus-visible { outline: 2px solid var(--volt); outline-offset: 2px; }
+@media (max-width: 1100px) { .site-header-inner { flex-wrap: wrap; gap: 0 12px; min-height: 0; } }
+@media (max-width: 420px) { .header-nav-item { padding: 0 10px; font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { .header-nav-item { transition: none; } }
+.period-picker-field .MuiInputBase-input { font-size: 16px; }
+.period-picker .period-all, .period-picker-grid button { font-size: 13px; }

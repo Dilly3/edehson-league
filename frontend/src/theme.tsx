@@ -80,13 +80,16 @@ function buildTheme(dark: boolean) { return createTheme({
         "&.MuiInputLabel-shrink": { transform: "none", maxWidth: "100%" },
       } },
     },
+    MuiInputBase: { styleOverrides: { root: { fontSize: 20 } } },
+    MuiSelect: { styleOverrides: { select: { fontSize: 16 } } },
+    MuiMenuItem: { styleOverrides: { root: { fontSize: 13 } } },
     MuiOutlinedInput: {
       defaultProps: { notched: false },
       styleOverrides: {
         root: {
           background: dark ? "rgba(8,24,14,.18)" : "rgba(255,253,248,.24)",
           color: dark ? "#f8faf5" : "#14251a", minHeight: 44,
-          borderRadius: 10, fontSize: "1rem", fontWeight: 500,
+          borderRadius: 10, fontSize: 20, fontWeight: 500,
         },
         notchedOutline: { borderColor: dark ? "#697a6d" : "#b9b3a3" },
       },

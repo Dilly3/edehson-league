@@ -1,0 +1,5 @@
+ssh_cidr            = "102.91.132.122/32"
+ssh_public_key_path = "~/.ssh/edehsons.pub"
+ssh_allowed_cidrs   = ["102.91.132.242/32", "102.91.0.0/32", "102.91.132.122/32"]
+
+# ssh-keygen -t ed25519 -f ~/.ssh/edehsons -C "edehsons-deploy"

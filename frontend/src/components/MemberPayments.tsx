@@ -1,5 +1,6 @@
 import ScrollTable from "./ScrollTable";
 import MemberCardPayments from "./MemberCardPayments";
+import PeriodPicker from "./PeriodPicker";
 import { useState } from "react";
 import { Alert, Button, CircularProgress, MenuItem, TextField } from "@mui/material";
 import { duesMonthLabel, duesStatusLabel, money, memberDuesForYear, duesYearTotals, watDate, type Card, type Payment, type Due, type Member, type RegisterData } from "../membership";
@@ -9,18 +10,15 @@ export default function MemberPayments({member,data,year,onYearChange,loading,er
 }){
  const [paymentType,setPaymentType]=useState("monthly");
  const [filter,setFilter]=useState("all"),[month,setMonth]=useState("all");
- const months=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
  const dues=memberDuesForYear(data.dues,member.id,year);
  const periodDues=dues.filter(d=>month==="all"||d.month.endsWith(`-${month}`));
  const periodLabel=month==="all"?year:duesMonthLabel(`${year}-${month}`);
  const totals=duesYearTotals(periodDues);
  const rows=periodDues.filter(d=>filter==="all"||d.status===filter);
  const latestYear=Math.max(Number(watDate().slice(0,4)),year);
- const years=Array.from({length:latestYear-2026+1},(_,i)=>latestYear-i);
  return <section className="member-payments" aria-labelledby="member-payments-heading">
   <header className="member-payments-header"><div><span className="eyebrow">{paymentType==="monthly"?"Monthly dues":`${paymentType} cards`}</span><h3 id="member-payments-heading">Payments</h3></div>
-   <div className="member-payments-filters"><TextField select label="Payment type" size="small" value={paymentType} onChange={e=>setPaymentType(e.target.value)}><MenuItem value="monthly">Monthly dues</MenuItem><MenuItem value="yellow">Yellow cards</MenuItem><MenuItem value="red">Red cards</MenuItem></TextField><TextField select label="Year" size="small" value={year} onChange={e=>onYearChange(Number(e.target.value))}>{years.map(y=><MenuItem key={y} value={y}>{y}</MenuItem>)}</TextField>
-    <TextField select label="Month" size="small" value={month} onChange={e=>setMonth(e.target.value)}><MenuItem value="all">All months</MenuItem>{months.map((m,i)=><MenuItem key={m} value={String(i+1).padStart(2,"0")}>{m}</MenuItem>)}</TextField>
+   <div className="member-payments-filters"><TextField select label="Payment type" size="small" value={paymentType} onChange={e=>setPaymentType(e.target.value)}><MenuItem value="monthly">Monthly dues</MenuItem><MenuItem value="yellow">Yellow cards</MenuItem><MenuItem value="red">Red cards</MenuItem></TextField><PeriodPicker year={year} month={month} minYear={2026} maxYear={latestYear} onChange={(y,m)=>{setMonth(m);if(y!==year)onYearChange(y);}}/>
     {paymentType==="monthly"&&<TextField select label="Show" size="small" value={filter} onChange={e=>setFilter(e.target.value)}><MenuItem value="all">All dues</MenuItem><MenuItem value="paid">Paid dues</MenuItem><MenuItem value="unpaid">Outstanding dues</MenuItem><MenuItem value="waived">Waived dues</MenuItem></TextField>}
    </div>
   </header>

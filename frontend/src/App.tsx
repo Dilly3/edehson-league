@@ -23,7 +23,11 @@ import { useAppearance } from "./theme";
 import TeamRenameDialog from "./components/TeamRenameDialog";
 import TeamSummary from "./components/TeamSummary";
 import TeamExplorer, { type ExplorerSelection } from "./components/TeamExplorer";
-import ScrollNavigation from "./components/ScrollNavigation";
+import HeaderNav from "./components/HeaderNav";
+import BadgeOutlined from "@mui/icons-material/BadgeOutlined";
+import EmojiEventsOutlined from "@mui/icons-material/EmojiEventsOutlined";
+import AdminPanelSettingsOutlined from "@mui/icons-material/AdminPanelSettingsOutlined";
+import LeagueBottomNav from "./components/LeagueBottomNav";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import RefreshRounded from "@mui/icons-material/RefreshRounded";
 import AddRounded from "@mui/icons-material/AddRounded";
@@ -114,7 +118,6 @@ export default function App() {
     [watchFixtureID, setWatchFixtureID] = useState(""),
     [toast, setToast] = useState(""),
     [round, setRound] = useState("all"),
-    [status, setStatus] = useState("all"),
     [search, setSearch] = useState(""),
     [selectedTeam, setSelectedTeam] = useState(""),
     [renamingTeam, setRenamingTeam] = useState(false),
@@ -265,12 +268,7 @@ export default function App() {
     (a, b) => a - b,
   );
   const filteredFixtures = data.fixtures.filter(
-    (f) =>
-      (round === "all" || String(f.matchday) === round) &&
-      (status === "all" || f.status === status) &&
-      `${f.home_team} ${f.away_team} ${f.home_team_tag} ${f.away_team_tag}`
-        .toLowerCase()
-        .includes(search.toLowerCase()),
+    (f) => round === "all" || String(f.matchday) === round,
   );
   const filteredStats = data.stats.filter((p) =>
     `${p.name} ${p.team_name} ${p.jersey_number}`
@@ -283,7 +281,7 @@ export default function App() {
         title="No fixtures to show"
         detail={
           data.fixtures.length
-            ? "Try another matchday, status, or team name."
+            ? "Try another matchday."
             : "The season schedule will appear once an admin generates the fixtures."
         }
       />
@@ -315,7 +313,7 @@ export default function App() {
     setAction(null);
   }} />;
   return (
-    <div className={`app-shell${page==="membership"?" roaster-background":""}`}>
+    <div className={`app-shell${page==="membership"?" roaster-background":""}${page!=="admin"?" has-bottom-nav":""}${page!=="membership"&&page!=="admin"?" league-pages":""}`}>
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
@@ -331,10 +329,11 @@ export default function App() {
               GreatMinds<b>Sport</b>
             </span>
           </a>
-          <ScrollNavigation>
-            {[{id:"membership" as Page,label:"Roaster",active:page==="membership"},{id:"overview" as Page,label:"League",active:page!=="membership"&&page!=="admin"}].map(({id,label,active})=><a key={id} href={pageURL(id,adminArea)} className={active?"nav-item active":"nav-item"} aria-current={active?"page":undefined} onClick={event=>{event.preventDefault();navigate(id);}}>{label}</a>)}
-            {adminArea && <a href="/admin" className={page === "admin" ? "nav-item active" : "nav-item"} aria-current={page === "admin" ? "page" : undefined} onClick={event => { event.preventDefault(); navigate("admin"); }}>Dashboard</a>}
-          </ScrollNavigation>
+          <HeaderNav items={[
+            {key:"membership",label:"Roaster",icon:<BadgeOutlined/>,href:pageURL("membership",adminArea),active:page==="membership",onSelect:()=>navigate("membership")},
+            {key:"league",label:"League",icon:<EmojiEventsOutlined/>,href:pageURL("overview",adminArea),active:page!=="membership"&&page!=="admin",onSelect:()=>navigate("overview")},
+            ...(adminArea?[{key:"admin",label:"Dashboard",icon:<AdminPanelSettingsOutlined/>,href:"/admin",active:page==="admin",onSelect:()=>navigate("admin")}]:[]),
+          ]}/>
           <div className="header-actions">
             
             <Tooltip title={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}>
@@ -361,7 +360,6 @@ export default function App() {
       <main id="main-content">
         {page!=="membership"&&page!=="admin"&&<section className="league-navigation" aria-label="RealEdehsonsLeague">
           <h1>RealEdehsonsLeague</h1>
-          <ScrollNavigation id="league-navigation" label="League navigation">{pages.filter(p=>p.id!=="membership").map(({id,label})=><a key={id} href={pageURL(id,adminArea)} className={page===id?"nav-item active":"nav-item"} aria-current={page===id?"page":undefined} onClick={event=>{event.preventDefault();navigate(id);}}>{label}</a>)}</ScrollNavigation>
         </section>}
 
         {page !== "overview" && (
@@ -452,10 +450,7 @@ export default function App() {
                       title="Latest results"
                       action={
                         <MoreButton
-                          onClick={() => {
-                            setStatus("finalized");
-                            navigate("fixtures");
-                          }}
+                          onClick={() => navigate("fixtures")}
                         >
                           All results
                         </MoreButton>
@@ -486,18 +481,6 @@ export default function App() {
             {page === "fixtures" && (
               <>
                 <div className="filter-bar">
-                  <TextField
-                    label="Search teams"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    slotProps={{
-                      input: {
-                        startAdornment: (
-                          <SearchRounded className="search-icon" />
-                        ),
-                      },
-                    }}
-                  />
                   <Select
                     size="small"
                     value={round}
@@ -510,20 +493,6 @@ export default function App() {
                         Matchday {r}
                       </MenuItem>
                     ))}
-                  </Select>
-                  <Select
-                    size="small"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    inputProps={{ "aria-label": "Filter by match status" }}
-                  >
-                    <MenuItem value="all">All matches</MenuItem>
-                    <MenuItem value="scheduled">Scheduled</MenuItem>
-                    <MenuItem value="live">Live</MenuItem>
-                    <MenuItem value="half_time">Half-time</MenuItem>
-                    <MenuItem value="finalized">Final results</MenuItem>
-                    <MenuItem value="postponed">Postponed</MenuItem>
-                    <MenuItem value="abandoned">Abandoned</MenuItem>
                   </Select>
                 </div>
                 {filteredFixtures.length
@@ -891,6 +860,7 @@ export default function App() {
           </div>
         )}
       </main>
+      {page!=="membership"&&page!=="admin"&&<LeagueBottomNav items={pages.filter(p=>p.id!=="membership")} page={page} adminArea={adminArea} onNavigate={navigate} />}
       <footer className="site-footer">
         <section className="footer-partners" aria-labelledby="partners-heading">
           <h2 id="partners-heading">Happy Hour</h2>
