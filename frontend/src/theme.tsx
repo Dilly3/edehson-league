@@ -20,7 +20,7 @@ export function LeagueThemeProvider({ children }: { children: ReactNode }) {
     document.documentElement.dataset.theme = mode;
     document.documentElement.style.colorScheme = mode;
     const meta = document.querySelector('meta[name="theme-color"]');
-    meta?.setAttribute("content", mode === "dark" ? "#111814" : "#0d3b2a");
+    meta?.setAttribute("content", mode === "dark" ? "#111814" : "#faf8f2");
   }, [mode]);
   const toggle = () => {
     const next = mode === "dark" ? "light" : "dark";

@@ -24,9 +24,11 @@ type RegisterData struct {
 }
 
 // api is the existing /api group. Pass the existing admin middleware.
-func Register(api *gin.RouterGroup, db *gorm.DB, admin gin.HandlerFunc) {
+// superAdmin guards the few actions only the super admin may take (deleting receipt files).
+func Register(api *gin.RouterGroup, db *gorm.DB, admin, superAdmin gin.HandlerFunc) {
 	g := api.Group("/membership")
 	g.Use(func(c *gin.Context) { c.Header("Cache-Control", "no-store"); c.Next() })
+	registerPaymentRequests(g, db, admin, superAdmin)
 	g.GET("", func(c *gin.Context) {
 		year, err := strconv.Atoi(c.Query("year"))
 		if err != nil || year < 2026 || year > 2200 {

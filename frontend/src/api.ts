@@ -1,6 +1,8 @@
 import type { Player, PlayerStats } from "./types";
 let adminCredential="";
 export function setAdminCredential(value:string){adminCredential=value;}
+/** Pass as the token to send a request without any admin credential (e.g. the login call itself). */
+const NO_CREDENTIAL=" ";
 export class ApiError extends Error {
   status: number;
   constructor(message: string, status: number) {
@@ -14,12 +16,14 @@ export async function api<T>(
   token?: string,
 ): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 20000);
+  const upload = typeof FormData !== "undefined" && options.body instanceof FormData;
+  // Receipt uploads can be several MB on a phone connection; give them longer.
+  const timeout = setTimeout(() => controller.abort(), upload ? 90000 : 20000);
   try {
     const headers = new Headers(options.headers);
     headers.set("Accept", "application/json");
-    if (options.body) headers.set("Content-Type", "application/json");
-    const credential=token||adminCredential;
+    if (options.body && !upload) headers.set("Content-Type", "application/json");
+    const credential=token===NO_CREDENTIAL?"":(token||adminCredential);
     if (credential) headers.set("Authorization", `Bearer ${credential}`);
     const response = await fetch(`/api${path}`, {
       ...options,
@@ -38,7 +42,6 @@ export async function api<T>(
         response.status,
       );
     }
-    if (response.status===401&&body.code==="viewer_auth_required"&&path!=="/viewer/session"&&typeof window!=="undefined") window.dispatchEvent(new Event("viewer-access-required"));
     if (!response.ok)
       throw new ApiError(
         typeof body.error === "string"
@@ -152,7 +155,31 @@ export function updateFixtureVenue(
   );
 }
 
-export async function verifyAdminKey(key: string): Promise<void> {
-  const result = await api<{ authenticated: boolean }>("/admin/session", {method:"GET"}, key);
+export type AdminRole = "super_admin" | "admin";
+export interface AdminPermissions { league: boolean; roaster: boolean }
+export interface AdminSession { token: string; role: AdminRole; username: string; permissions: AdminPermissions }
+export interface AdminUser { id: string; username: string; active: boolean; can_league: boolean; can_roaster: boolean; created_at: string; last_login_at: string | null }
+
+/** Super admin: verifies the ADMIN_TOKEN key. */
+export async function verifyAdminKey(key: string): Promise<AdminSession> {
+  const result = await api<{ authenticated: boolean; role: AdminRole; username: string; permissions: AdminPermissions }>("/admin/session", {method:"GET"}, key);
   if (result.authenticated !== true) throw new Error("Admin authentication could not be verified.");
+  return { token: key, role: result.role, username: result.username, permissions: result.permissions };
 }
+
+/** Admin account: exchanges username and password for a session token. */
+export function loginAdmin(username: string, password: string): Promise<AdminSession> {
+  return api<AdminSession>("/admin/login", { method: "POST", body: JSON.stringify({ username, password }) }, NO_CREDENTIAL);
+}
+
+export async function logoutAdmin(token: string): Promise<void> {
+  await api("/admin/logout", { method: "POST", body: "{}" }, token);
+}
+
+export const listAdmins = (token: string) => api<AdminUser[]>("/admin/users", {}, token);
+export const createAdmin = (token: string, username: string, password: string, perms: AdminPermissions) =>
+  api<AdminUser>("/admin/users", { method: "POST", body: JSON.stringify({ username, password, can_league: perms.league, can_roaster: perms.roaster }) }, token);
+export const updateAdmin = (token: string, id: string, change: { active?: boolean; password?: string; can_league?: boolean; can_roaster?: boolean }) =>
+  api<AdminUser>(`/admin/users/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify(change) }, token);
+export const deleteAdmin = (token: string, id: string) =>
+  api<void>(`/admin/users/${encodeURIComponent(id)}`, { method: "DELETE" }, token);

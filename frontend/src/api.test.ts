@@ -272,10 +272,3 @@ it("uses cookie sessions and the in-memory admin credential for protected reads"
  expect(options.credentials).toBe("same-origin");
  expect(options.headers.get("Authorization")).toBe("Bearer test-session-key");
 });
-it("locks the viewer when the server revokes a session",async()=>{
- const dispatchEvent=vi.fn();vi.stubGlobal("window",{dispatchEvent});
- vi.stubGlobal("fetch",vi.fn().mockResolvedValue(new Response(JSON.stringify({error:"Enter PIN",code:"viewer_auth_required"}),{status:401})));
- await expect(api("/teams")).rejects.toBeInstanceOf(ApiError);
- expect(dispatchEvent).toHaveBeenCalledOnce();
- expect(dispatchEvent.mock.calls[0][0].type).toBe("viewer-access-required");
-});

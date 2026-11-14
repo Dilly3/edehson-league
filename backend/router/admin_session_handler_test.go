@@ -32,7 +32,7 @@ func TestAdminSessionRequiresCorrectKey(t *testing.T) {
 			t.Fatalf("expected %d, got %d", tc.status, w.Code)
 		}
 		if tc.status == http.StatusOK {
-			if w.Header().Get("Cache-Control") != "no-store" || !strings.Contains(w.Body.String(), `"authenticated":true`) {
+			if w.Header().Get("Cache-Control") != "no-store" || !strings.Contains(w.Body.String(), `"authenticated":true`) || !strings.Contains(w.Body.String(), `"role":"super_admin"`) {
 				t.Fatal("invalid auth response")
 			}
 		}

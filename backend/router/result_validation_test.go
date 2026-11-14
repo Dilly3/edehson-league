@@ -128,9 +128,21 @@ func TestValidateResult(t *testing.T) {
 			wantErr: "scores cannot be negative",
 		},
 		{
-			name:    "score without matching goals",
-			input:   result(1, 0),
-			wantErr: "goal events produce",
+			name:  "score without any goal events",
+			input: result(3, 2),
+		},
+		{
+			name: "some goals logged, the rest left out",
+			input: result(2, 0,
+				event(homePlayer, models.EventGoal, 10),
+			),
+		},
+		{
+			name: "more goals logged than the score",
+			input: result(0, 0,
+				event(homePlayer, models.EventGoal, 10),
+			),
+			wantErr: "more than the submitted score",
 		},
 		{
 			name: "invalid player UUID",

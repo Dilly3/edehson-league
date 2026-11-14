@@ -53,8 +53,8 @@ import {
 } from "./components/Shared";
 import AdminForms, { type AdminAction } from "./components/AdminForms";
 import MembershipPage from "./components/MembershipPage";
-import { ViewerPINSettings, logoutViewer } from "./components/ViewerAccess";
-import { setAdminCredential } from "./api";
+import { setAdminCredential, logoutAdmin, type AdminRole, type AdminPermissions } from "./api";
+import AdminUsers from "./components/AdminUsers";
 import AdminLogin from "./components/AdminLogin";
 import { isAdminPath, resolvePage, pageURL, type Page } from "./navigation";
 import LiveBroadcastSection from "./components/LiveBroadcastSection";
@@ -112,7 +112,10 @@ export default function App() {
     [refreshing, setRefreshing] = useState(false),
     [errors, setErrors] = useState<string[]>([]),
     [updated, setUpdated] = useState<Date | null>(null),
-    [token, setToken] = useState(""),
+    [adminToken, setToken] = useState(""),
+    [perms, setPerms] = useState<AdminPermissions>({ league: false, roaster: false }),
+    [adminRole, setAdminRole] = useState<AdminRole | null>(null),
+    [adminName, setAdminName] = useState(""),
     [action, setAction] = useState<AdminAction>(null),
     [selectedFixture, setSelectedFixture] = useState<Fixture | null>(null),
     [watchFixtureID, setWatchFixtureID] = useState(""),
@@ -129,6 +132,9 @@ export default function App() {
     } | null>(null),
     [rosterLoading, setRosterLoading] = useState(false),
     [rosterError, setRosterError] = useState("");
+  // League and Roaster admin controls only receive a token when the account has that permission.
+  const token = perms.league ? adminToken : "";
+  const roasterToken = perms.roaster ? adminToken : "";
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 60000);
@@ -139,7 +145,7 @@ export default function App() {
   const generation = useRef(0),
     rosterGeneration = useRef(0);
   const refresh = useCallback(async () => {
-    if(adminArea&&!token)return;
+    if(adminArea&&!adminToken)return;
     const g = ++generation.current;
     setRefreshing(true);
     const requests = await Promise.allSettled([
@@ -168,7 +174,7 @@ export default function App() {
     if (currentErrors.length === 0) setUpdated(new Date());
     setLoading(false);
     setRefreshing(false);
-  }, [adminArea,token]);
+  }, [adminArea,adminToken]);
   useEffect(() => {
     void refresh();
   }, [refresh]);
@@ -199,7 +205,7 @@ export default function App() {
     if (!selectedTeam && data.teams.length) setSelectedTeam(data.teams[0].tag);
   }, [data.teams, selectedTeam]);
   const loadRoster = useCallback(async () => {
-    if (!selectedTeam || (adminArea&&!token)) return;
+    if (!selectedTeam || (adminArea&&!adminToken)) return;
     const g = ++rosterGeneration.current;
     setRosterLoading(true);
     setRosterError("");
@@ -214,7 +220,7 @@ export default function App() {
     } finally {
       if (g === rosterGeneration.current) setRosterLoading(false);
     }
-  }, [selectedTeam,adminArea,token]);
+  }, [selectedTeam,adminArea,adminToken]);
   useEffect(() => {
     void loadRoster();
   }, [loadRoster]);
@@ -305,9 +311,12 @@ export default function App() {
         team: p.team_name,
       },
     });
-  if (adminArea && !token) return <AdminLogin onVerified={key => {
-    setAdminCredential(key);
-    setToken(key);
+  if (adminArea && !adminToken) return <AdminLogin onVerified={session => {
+    setAdminCredential(session.token);
+    setToken(session.token);
+    setPerms(session.permissions);
+    setAdminRole(session.role);
+    setAdminName(session.username);
     window.history.replaceState(null, "", "/admin");
     setPage("admin");
     setAction(null);
@@ -396,7 +405,7 @@ export default function App() {
           </div>
         ) : (
           <div className="page" key={page}>
-            {page === "membership" && <MembershipPage token={token} />}
+            {page === "membership" && <MembershipPage token={roasterToken} superAdmin={adminRole === "super_admin"} />}
             {page === "overview" && (
               <>
                 <MatchFeature
@@ -793,13 +802,14 @@ export default function App() {
             {page === "admin" && (
               <>
                 <section className="admin-intro panel">
-                  <div><h2>Administration</h2><p>You are signed in for this session.</p></div>
+                  <div><h2>Administration</h2><p>Signed in as <strong>{adminRole === "super_admin" ? "Super admin" : adminName}</strong>{adminRole === "admin" ? ` (admin · ${[perms.league && "League", perms.roaster && "Roaster"].filter(Boolean).join(" & ")})` : ""} for this session.</p></div>
                   <Button startIcon={<LogoutRounded />} onClick={() => {
-                    setAdminCredential(""); setToken(""); setAction(null); setSelectedFixture(null); setRenamingTeam(false); setPlayerAction(null); navigate("admin");
+                    if (adminRole === "admin") void logoutAdmin(adminToken).catch(() => {});
+                    setAdminCredential(""); setToken(""); setPerms({ league: false, roaster: false }); setAdminRole(null); setAdminName(""); setAction(null); setSelectedFixture(null); setRenamingTeam(false); setPlayerAction(null); navigate("admin");
                   }}>Log out</Button>
                 </section>
-                <ViewerPINSettings token={token}/>
-                <div className="admin-grid">
+                {adminRole === "super_admin" && <AdminUsers token={adminToken}/>}
+                {perms.league && <div className="admin-grid">
                   <AdminCard
                     title="Team management"
                     detail="Manage team, player details, jersey numbers, and team captains."
@@ -820,12 +830,12 @@ export default function App() {
                     }
                     onClick={() => adminAction("generate")}
                   />
-                </div>
-                <section className="panel membership-admin-entry">
+                </div>}
+                {perms.roaster && <section className="panel membership-admin-entry">
                   <div><h2>Great Minds Sport</h2><p>Manage independent members, monthly dues, card fines, fee rates and record history.</p></div>
                   <Button variant="contained" onClick={() => navigate("membership")}>Manage membership</Button>
-                </section>
-                <section className="panel">
+                </section>}
+                {perms.league && <><section className="panel">
                   <SectionHeading title="Schedule completeness" />
                   <div className="schedule-completeness-body">
                   <div className="schedule-completeness-counts">
@@ -854,7 +864,7 @@ export default function App() {
                 <Alert severity="info">
                   Use Teams to edit rosters and assign captains. Players with
                   match records are protected from removal.
-                </Alert>
+                </Alert></>}
               </>
             )}
           </div>

@@ -134,7 +134,8 @@ func TestMembershipLedgerPostgres(t *testing.T) {
 	}
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
-	Register(router.Group("/api"), db, func(c *gin.Context) { c.AbortWithStatus(http.StatusUnauthorized) })
+	deny := func(c *gin.Context) { c.AbortWithStatus(http.StatusUnauthorized) }
+	Register(router.Group("/api"), db, deny, deny)
 	public := httptest.NewRecorder()
 	router.ServeHTTP(public, httptest.NewRequest("GET", "/api/membership?year="+today()[:4], nil))
 	if public.Code != http.StatusOK {

@@ -430,6 +430,16 @@ func apply(tx *gorm.DB, in Input, log *CommandRecord) error {
 		}
 		log.After = snapshot(p)
 		return nil
+	case "add_donation":
+		if err := validateDonation(member, in); err != nil {
+			return err
+		}
+		p := Payment{MemberID: member.ID, Kind: "donation", Amount: in.Amount, PaidOn: in.PaidOn, Note: strings.TrimSpace(in.Note)}
+		if err := tx.Create(&p).Error; err != nil {
+			return err
+		}
+		log.After = snapshot(p)
+		return nil
 	case "edit_donation":
 		if _, err := uuid.Parse(in.RecordID); err != nil {
 			return invalid("Select a donation")
@@ -514,4 +524,17 @@ func earliestDuesPayment(month, joined string) string {
 		earliest = month + "-01"
 	}
 	return earliest
+}
+
+func validateDonation(member Member, in Input) error {
+	if in.Amount < 1 || in.Amount > 10000000000 {
+		return invalid("Enter a donation amount greater than zero")
+	}
+	if !validDate(in.PaidOn) || in.PaidOn < member.JoinedOn || in.PaidOn > today() {
+		return invalid("Choose a donation date on or after joining and not in the future")
+	}
+	if strings.TrimSpace(in.Note) == "" {
+		return invalid("Enter the donation purpose")
+	}
+	return nil
 }

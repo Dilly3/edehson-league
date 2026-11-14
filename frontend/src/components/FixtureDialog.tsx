@@ -132,8 +132,11 @@ export default function FixtureDialog({
   const current = detail?.fixture ?? fixture;
   const calculated = scoreEvents(current, events, rosters);
   const validation = validateEvents(events);
+  // Goal events are optional; they just can't add up to more than the score.
   const mismatch =
-    calculated.home !== score.home || calculated.away !== score.away;
+    calculated.home > score.home || calculated.away > score.away;
+  const unlogged =
+    Math.max(0, score.home - calculated.home) + Math.max(0, score.away - calculated.away);
   const available = Object.values(rosters).flat();
   const patchEvent = (index: number, patch: Partial<MatchEvent>) =>
     setEvents(events.map((e, i) => (i === index ? { ...e, ...patch } : e)));
@@ -148,7 +151,7 @@ export default function FixtureDialog({
   const save = async (kind: "result" | "kickoff" | "venue" | "broadcast") => {
     setError("");
     if (kind === "result" && (validation || mismatch)) {
-      setError(validation ?? "The goal events must match the final score.");
+      setError(validation ?? "There are more goal events than the score. Raise the score or remove a goal.");
       return;
     }
     if (kind === "venue") {
@@ -363,7 +366,7 @@ export default function FixtureDialog({
                   {token && tab === 1 && (
                     <>
                       <Alert severity="info">
-                        Enter every goal and card in match order. Scorers are optional; cards require a player. Select the responsible team for unnamed goals. Own goals
+                        Set the score, then optionally add goals and cards in match order. You can save just the full-time score with no events, or log only the goals you know. Cards require a player; select the responsible team for unnamed goals. Own goals
                         count for the opposing team. Saving replaces the
                         current score and event list and publishes immediately.
                         Standings and player totals update only at full time.
@@ -528,11 +531,17 @@ export default function FixtureDialog({
                       ))}
                       <Alert
                         severity={
-                          validation || mismatch ? "warning" : "success"
+                          validation || mismatch ? "warning" : unlogged ? "info" : "success"
                         }
                       >
                         {validation ??
-                          `Goal events produce ${calculated.home}–${calculated.away}.${mismatch ? " This must match your current score." : " Score and goal events match."}`}
+                          (mismatch
+                            ? `Goal events produce ${calculated.home}–${calculated.away}, which is more than the score of ${score.home}–${score.away}. Raise the score or remove a goal.`
+                            : !events.some(e => e.type === "goal" || e.type === "own_goal")
+                              ? `No goal events logged. The score ${score.home}–${score.away} will be saved on its own.`
+                              : unlogged
+                                ? `Goal events cover ${calculated.home}–${calculated.away}. The other ${unlogged} goal${unlogged === 1 ? " stays" : "s stay"} unlogged, which is fine.`
+                                : "Score and goal events match.")}
                       </Alert>
                     </>
                   )}

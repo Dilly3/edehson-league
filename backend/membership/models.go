@@ -86,6 +86,8 @@ type Payment struct {
 	PaidOn   string  `gorm:"size:10;not null" json:"paid_on"`
 	Note     string  `gorm:"size:300" json:"note"`
 	Void     bool    `gorm:"not null" json:"void"`
+	// Set when the payment was recorded by confirming a player's receipt.
+	ReceiptRequestID *string `gorm:"type:uuid;index" json:"receipt_request_id"`
 }
 
 func (Payment) TableName() string { return "club_payments" }
@@ -118,6 +120,9 @@ func (CommandRecord) TableName() string { return "club_commands" }
 
 func Migrate(db *gorm.DB) error {
 	if err := db.AutoMigrate(&Member{}, &Fee{}, &AnnualFee{}, &Due{}, &Card{}, &Payment{}, &Allocation{}, &CommandRecord{}); err != nil {
+		return err
+	}
+	if err := migratePaymentRequests(db); err != nil {
 		return err
 	}
 	return db.Transaction(func(tx *gorm.DB) error {

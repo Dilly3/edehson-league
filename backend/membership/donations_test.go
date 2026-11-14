@@ -296,3 +296,23 @@ func TestDefaultHistoricalCardDatesPostgres(t *testing.T) {
 		t.Fatal("default migration not idempotent")
 	}
 }
+
+func TestAddDonationValidation(t *testing.T) {
+	m := Member{JoinedOn: "2026-02-01"}
+	for _, tc := range []struct {
+		name string
+		in   Input
+	}{
+		{"zero amount", Input{Type: "add_donation", Amount: 0, PaidOn: "2026-03-01", Note: "Kits"}},
+		{"before joining", Input{Type: "add_donation", Amount: 5000, PaidOn: "2026-01-15", Note: "Kits"}},
+		{"future date", Input{Type: "add_donation", Amount: 5000, PaidOn: "2999-01-01", Note: "Kits"}},
+		{"no purpose", Input{Type: "add_donation", Amount: 5000, PaidOn: "2026-03-01", Note: "  "}},
+	} {
+		if err := validateDonation(m, tc.in); err == nil {
+			t.Errorf("%s: expected an error", tc.name)
+		}
+	}
+	if err := validateDonation(m, Input{Type: "add_donation", Amount: 5000, PaidOn: "2026-03-01", Note: "Kits"}); err != nil {
+		t.Fatalf("valid donation rejected: %v", err)
+	}
+}

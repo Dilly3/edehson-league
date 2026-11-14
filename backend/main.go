@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/dilly3/edehson-league/database"
+	"github.com/dilly3/edehson-league/membership"
 	"github.com/dilly3/edehson-league/router"
 )
 
@@ -33,6 +36,17 @@ func main() {
 	if len(adminToken) < 32 {
 		log.Fatal("ADMIN_TOKEN must contain at least 32 characters")
 	}
+
+	// PAYMENT RECEIPTS (S3 when S3_BUCKET is set, local disk otherwise)
+	store, err := membership.NewReceiptStoreFromEnv(context.Background())
+	if err != nil {
+		log.Fatalf("Receipt storage: %v", err)
+	}
+	membership.SetReceiptStore(store)
+	if days, err := strconv.Atoi(os.Getenv("RECEIPT_RETENTION_DAYS")); err == nil && days > 0 {
+		membership.ReceiptRetention = time.Duration(days) * 24 * time.Hour
+	}
+	membership.StartReceiptCleanup(context.Background(), db)
 
 	h, err := router.NewServer(db, sqldb, adminToken)
 	if err != nil {

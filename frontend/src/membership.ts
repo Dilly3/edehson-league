@@ -2,7 +2,7 @@ export interface Member { id:string; name:string; joined_on:string; active:boole
 export interface Fee { id:string; kind:"monthly"|"yellow"|"red"; effective_from:string; amount:number }
 export interface Due { auto_waived?:boolean; id:string; member_id:string; month:string; amount:number; status:"unpaid"|"paid"|"waived"; revision:number }
 export interface Card { id:string; member_id:string; color:"yellow"|"red"; count:number; unit_amount:number; occurred_on:string; note:string; void:boolean }
-export interface Payment { id:string; member_id:string; kind:string; due_id:string|null; amount:number; paid_on:string; note:string; void:boolean }
+export interface Payment { id:string; member_id:string; kind:string; due_id:string|null; amount:number; paid_on:string; note:string; void:boolean; receipt_request_id?:string|null }
 export interface Allocation { id:string; payment_id:string; card_id:string; count:number }
 export interface AnnualFee {id:string; year:number; amount:number; revision:number; locked:boolean}
 export interface RegisterData { annual_fees?:AnnualFee[]; members:Member[]; fees:Fee[]; dues:Due[]; cards:Card[]; payments:Payment[]; allocations:Allocation[] }

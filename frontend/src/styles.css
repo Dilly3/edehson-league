@@ -2406,7 +2406,8 @@ h1 {
 :root[data-theme="dark"] .period-picker .period-all.selected { background: var(--volt); border-color: var(--volt); color: var(--pitch); }
 
 /* Header icon navigation (Roaster / League / Dashboard): its own row under the brand, inside the sticky header. */
-.site-header-inner { flex-wrap: wrap; align-items: center; gap: 0 12px; min-height: 0; }
+.site-header-inner { flex-wrap: wrap; align-items: center; gap: 0 12px; min-height: 0; max-width: none; margin: 0; }
+.site-header .brand { margin-right: auto; }
 .site-header .brand { order: 1; padding-block: 10px 6px; }
 .site-header .header-actions { order: 2; margin-left: auto; }
 .header-nav {
@@ -2431,3 +2432,297 @@ h1 {
 @media (prefers-reduced-motion: reduce) { .header-nav-item { transition: none; } }
 .period-picker-field .MuiInputBase-input { font-size: 16px; }
 .period-picker .period-all, .period-picker-grid button { font-size: 13px; }
+
+/* ---------- Header: light, refined (overrides the earlier dark header rules) ---------- */
+.site-header {
+  background: rgba(250, 248, 242, .86);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(160%) blur(14px);
+  color: var(--ink);
+  border-bottom: 1px solid var(--rule);
+  box-shadow: 0 1px 0 rgba(255,255,255,.7) inset, 0 6px 24px -18px rgba(13,59,42,.35);
+}
+.site-header :focus-visible { outline-color: var(--pitch); }
+.site-header-inner {
+  flex-wrap: nowrap; align-items: center; gap: 24px;
+  min-height: 64px; padding: 0 var(--gutter);
+}
+.site-header .brand { order: 1; margin-right: 0; padding-block: 10px; color: var(--pitch); gap: 10px; }
+.site-header .brand img { width: 36px; height: 36px; }
+.site-header .brand-name { font-size: 22px; font-weight: 700; letter-spacing: .05em; color: var(--pitch); }
+.site-header .brand-name b { color: var(--ink-3); font-weight: 400; margin-left: 1px; }
+
+.header-nav {
+  order: 2; flex: 1 1 auto; justify-content: center; align-items: stretch;
+  gap: 8px; padding: 0; align-self: stretch;
+}
+.header-nav-item {
+  position: relative; gap: 8px; min-height: 64px; padding: 0 16px; border-radius: 0;
+  color: var(--ink-2); background: transparent;
+  font-family: var(--display); font-weight: 600; font-size: 14px; letter-spacing: .14em;
+  transition: color .2s ease;
+}
+.header-nav-icon svg { font-size: 18px; opacity: .7; transition: opacity .2s ease; }
+.header-nav-item::after {
+  content: ""; position: absolute; left: 16px; right: 16px; bottom: -1px; height: 2px;
+  background: var(--pitch); border-radius: 2px;
+  transform: scaleX(0); transform-origin: center; transition: transform .25s ease;
+}
+.header-nav-item:hover { color: var(--ink); background: transparent; }
+.header-nav-item:hover::after { transform: scaleX(.35); }
+.header-nav-item.active { color: var(--pitch); background: transparent; }
+.header-nav-item.active .header-nav-icon svg,
+.header-nav-item:hover .header-nav-icon svg { opacity: 1; }
+.header-nav-item.active::after { transform: scaleX(1); }
+.header-nav-item:focus-visible { outline: 2px solid var(--pitch); outline-offset: -4px; border-radius: 6px; }
+
+.site-header .header-actions { order: 3; margin-left: 0; gap: 4px; }
+.site-header .header-actions .theme-toggle,
+.site-header .refresh-button.MuiIconButton-root { color: var(--ink-2); width: 40px; height: 40px; }
+.site-header .header-actions .theme-toggle:hover,
+.site-header .refresh-button.MuiIconButton-root:hover { color: var(--pitch); background: rgba(13,59,42,.06); }
+.site-header .refresh-button.MuiIconButton-root.Mui-disabled { color: var(--ink-3); opacity: .5; }
+.site-header .header-actions .viewer-logout.MuiButton-root,
+.site-header .header-actions .admin-button.MuiButton-root {
+  color: var(--pitch); border: 1px solid var(--rule); border-radius: 999px; min-height: 36px;
+}
+.site-header .header-actions .viewer-logout.MuiButton-root:hover,
+.site-header .header-actions .admin-button.MuiButton-root:hover { background: rgba(13,59,42,.05); border-color: var(--pitch); }
+
+/* Narrow screens: nav drops to its own quiet row under the brand. */
+@media (max-width: 760px) {
+  .site-header-inner { flex-wrap: wrap; gap: 0 12px; min-height: 0; }
+  .site-header .brand { margin-right: auto; padding-block: 8px; }
+  .site-header .header-actions { order: 2; margin-left: auto; }
+  .header-nav {
+    order: 3; flex: 1 0 100%; justify-content: space-around; gap: 0;
+    border-top: 1px solid var(--rule-soft); margin: 0 calc(var(--gutter) * -1); padding: 0 var(--gutter);
+  }
+  .header-nav-item { flex: 1; justify-content: center; min-height: 46px; padding: 0 8px; font-size: 13px; letter-spacing: .12em; }
+  .header-nav-item::after { left: 22%; right: 22%; }
+}
+@media (max-width: 420px) {
+  .site-header .brand-name { font-size: 19px; }
+  .site-header .brand img { width: 32px; height: 32px; }
+  .header-nav-item { gap: 6px; font-size: 12px; letter-spacing: .1em; }
+}
+
+/* Dark mode keeps the same structure on a smoked-glass surface. */
+:root[data-theme="dark"] .site-header {
+  background: rgba(17, 24, 20, .84); border-bottom-color: var(--rule);
+  box-shadow: 0 6px 24px -18px rgba(0,0,0,.8);
+}
+:root[data-theme="dark"] .site-header .brand,
+:root[data-theme="dark"] .site-header .brand-name { color: var(--ink); }
+:root[data-theme="dark"] .site-header .brand-name b { color: var(--volt); }
+:root[data-theme="dark"] .header-nav-item.active { color: var(--volt); }
+:root[data-theme="dark"] .header-nav-item::after { background: var(--volt); }
+:root[data-theme="dark"] .site-header :focus-visible,
+:root[data-theme="dark"] .header-nav-item:focus-visible { outline-color: var(--volt); }
+:root[data-theme="dark"] .site-header .header-actions .theme-toggle:hover,
+:root[data-theme="dark"] .site-header .refresh-button.MuiIconButton-root:hover { color: var(--volt); background: rgba(255,255,255,.06); }
+:root[data-theme="dark"] .site-header .header-actions .viewer-logout.MuiButton-root,
+:root[data-theme="dark"] .site-header .header-actions .admin-button.MuiButton-root { color: var(--ink); border-color: var(--rule); }
+@media (prefers-reduced-motion: reduce) { .header-nav-item::after, .header-nav-item { transition: none; } }
+
+/* Roaster page title: same scale as the league page titles. */
+.roaster-background .page-title { margin-bottom: 22px; padding-bottom: 14px; }
+.roaster-background .page-title h1 { font-size: clamp(28px, 4.5vw, 44px); line-height: .95; }
+.roaster-background .page-title p { margin-top: 8px; font-size: 15px; }
+
+/* Player names: elegant serif against the condensed sans. */
+:root { --names: "Playfair Display", Georgia, "Times New Roman", serif; }
+.membership-table tbody th .text-link,
+.membership-table tbody .member-name-cell,
+.member-name-heading.MuiDialogTitle-root,
+.player-name-line .text-link {
+  font-family: var(--names);
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: .005em;
+  text-transform: none;
+}
+.member-name-heading.MuiDialogTitle-root { font-weight: 700; }
+.membership-table tbody .member-name-cell .membership-inactive { font-family: var(--body); font-style: normal; }
+
+/* Admin login: Admin / Super admin switch on the dark access card. */
+.admin-login-modes { display: inline-flex; gap: 4px; margin-top: 18px; padding: 4px; border-radius: 999px; background: rgba(3,19,10,.22); border: 1px solid rgba(255,255,255,.18); }
+.admin-login-modes button { appearance: none; border: 0; background: transparent; color: rgba(255,253,246,.75); font-family: var(--display); font-weight: 700; font-size: 14px; letter-spacing: .1em; text-transform: uppercase; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: background .15s, color .15s; }
+.admin-login-modes button:hover:not(:disabled) { color: #fffdf6; }
+.admin-login-modes button.active { background: var(--volt); color: var(--pitch); }
+.admin-login-modes button:focus-visible { outline: 2px solid var(--volt); outline-offset: 2px; }
+.admin-login-modes + .viewer-admin-message { margin-top: 14px; }
+
+/* Super admin: admin accounts panel. */
+.admin-users h2 { margin-top: 0; }
+.admin-users > p { color: var(--ink-2); margin-top: 0; }
+.admin-users .MuiAlert-root { margin-bottom: 14px; }
+.admin-users-form { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: 14px; align-items: start; margin: 8px 0 22px; }
+.admin-users-form .MuiButton-root { margin-top: 26px; min-height: 44px; white-space: nowrap; }
+.admin-users-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.admin-users-list li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 2px; border-bottom: 1px solid var(--rule-soft); }
+.admin-users-list li > div:first-child { display: grid; gap: 2px; min-width: 0; }
+.admin-users-list strong { font-family: var(--names, var(--body)); font-size: 1.15rem; font-weight: 600; overflow-wrap: anywhere; }
+.admin-users-list small { color: var(--ink-3); font-size: 13px; }
+.admin-users-list li.inactive strong { color: var(--ink-3); text-decoration: line-through; text-decoration-thickness: 1px; }
+@media (max-width: 700px) {
+  .admin-users-form { grid-template-columns: 1fr; }
+  .admin-users-form .MuiButton-root { margin-top: 0; }
+}
+
+/* Player profile: at-a-glance balance summary (replaces the flip-card carousel). */
+.member-summary { display: grid; gap: 12px; margin: 4px 0 6px; }
+.member-summary-total { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 2px 12px; padding: 14px 16px; border-radius: 14px; background: var(--card); border: 1px solid var(--rule); }
+.member-summary-total > span { font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2); }
+.member-summary-total > strong { grid-row: span 2; font-family: var(--display); font-size: clamp(1.6rem, 5vw, 2.1rem); font-weight: 800; color: var(--pitch); line-height: 1; }
+.member-summary-total.owes > strong { color: #b8321f; }
+.member-summary-total > small { color: var(--ink-3); font-size: 12.5px; }
+.member-summary-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.member-summary-tile { display: grid; align-content: start; gap: 4px; min-width: 0; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--rule); border-top-width: 4px; }
+.member-summary-tile.dues { border-top-color: var(--pitch); }
+.member-summary-tile.yellow { border-top-color: #facc15; }
+.member-summary-tile.red { border-top-color: #b91c1c; }
+.member-summary-tile header { display: flex; align-items: center; gap: 7px; font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); }
+.member-summary-tile header i { width: 10px; height: 14px; border-radius: 2px; flex: none; background: var(--pitch); }
+.member-summary-tile.yellow header i { background: #facc15; }
+.member-summary-tile.red header i { background: #b91c1c; }
+.member-summary-tile.dues header i { width: 10px; height: 10px; border-radius: 50%; }
+.member-summary-tile > strong { font-size: 1.25rem; font-weight: 700; overflow-wrap: anywhere; }
+.member-summary-tile p { margin: 0; font-size: 13px; color: var(--ink-2); line-height: 1.4; }
+.member-summary-tile p b { color: var(--ink); }
+:root[data-theme="dark"] .member-summary-total > strong { color: var(--volt); }
+:root[data-theme="dark"] .member-summary-total.owes > strong { color: #ff9d8a; }
+:root[data-theme="dark"] .member-summary-tile.dues, :root[data-theme="dark"] .member-summary-tile.dues header i { border-top-color: var(--volt); }
+:root[data-theme="dark"] .member-summary-tile.dues header i { background: var(--volt); }
+@media (max-width: 600px) {
+  .member-summary-tiles { grid-template-columns: 1fr; gap: 8px; }
+  .member-summary-tile { grid-template-columns: 1fr auto; align-items: baseline; border-top-width: 1px; border-left-width: 4px; }
+  .member-summary-tile.dues { border-left-color: var(--pitch); border-top-color: var(--rule); }
+  .member-summary-tile.yellow { border-left-color: #facc15; border-top-color: var(--rule); }
+  .member-summary-tile.red { border-left-color: #b91c1c; border-top-color: var(--rule); }
+  .member-summary-tile > strong { grid-column: 2; grid-row: 1; font-size: 1.05rem; }
+  .member-summary-tile p { grid-column: 1 / -1; }
+}
+
+/* Mobile: admin action buttons stack as an even two-column grid. */
+@media (max-width: 600px) {
+  .membership-toolbar > .membership-buttons,
+  .dialog-form > .membership-buttons {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; width: 100%;
+  }
+  .membership-toolbar > .membership-buttons .MuiButton-root,
+  .dialog-form > .membership-buttons .MuiButton-root {
+    width: 100%; min-height: 44px; margin: 0; padding: 8px 10px; font-size: .85rem; line-height: 1.15; text-align: center;
+  }
+  /* Primary actions first and full width on the profile. */
+  .dialog-form > .membership-buttons .MuiButton-contained:first-child { grid-column: 1 / -1; }
+}
+
+/* Search field with the refresh icon beside it. */
+.membership-toolbar .membership-filters > .membership-search { display: flex; align-items: flex-end; gap: 4px; flex: 1.3 1 200px; min-width: 160px; max-width: 320px; }
+.membership-search > .MuiTextField-root { flex: 1 1 auto; min-width: 0; width: auto; }
+.membership-refresh.MuiIconButton-root { width: 44px; height: 44px; color: var(--ink-2); }
+.membership-refresh.MuiIconButton-root:hover { color: var(--pitch); background: rgba(13,59,42,.06); }
+:root[data-theme="dark"] .membership-refresh.MuiIconButton-root:hover { color: var(--volt); }
+@media (max-width: 600px) { .membership-toolbar .membership-filters > .membership-search { max-width: none; flex-basis: 100%; } }
+
+/* Admin permissions: checkboxes on create, toggle chips per admin. */
+.admin-users-form { grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto auto; }
+.admin-perms { display: flex; flex-wrap: nowrap; gap: 0 4px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.admin-perms legend { padding: 0; margin-bottom: 2px; font-size: .8125rem; font-weight: 600; color: var(--ink-2); }
+.admin-perms .MuiFormControlLabel-root { margin: 0 8px 0 -9px; }
+.admin-perm-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.admin-perm-chips button { appearance: none; border: 1px solid var(--rule); background: transparent; color: var(--ink-3); border-radius: 999px; padding: 3px 11px; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.admin-perm-chips button.on { background: var(--pitch); border-color: var(--pitch); color: #fff; }
+.admin-perm-chips button:hover:not(:disabled) { border-color: var(--pitch); }
+.admin-perm-chips button:disabled { cursor: default; opacity: .85; }
+.admin-perm-chips button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+:root[data-theme="dark"] .admin-perm-chips button.on { background: var(--volt); border-color: var(--volt); color: var(--pitch); }
+@media (max-width: 900px) { .admin-users-form { grid-template-columns: minmax(0,1fr) minmax(0,1fr); } .admin-perms { grid-column: 1 / -1; } }
+@media (max-width: 700px) { .admin-users-form { grid-template-columns: 1fr; } }
+
+/* ---------- Make payment (player) ---------- */
+.make-payment-button.MuiButton-root { min-height: 44px; padding-inline: 22px; }
+.pay-step { display: grid; gap: 12px; padding: 14px 0 6px; border-top: 1px solid var(--rule-soft); }
+.pay-step:first-child { border-top: 0; padding-top: 0; }
+.pay-step h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-family: var(--display); font-size: 1.05rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.pay-step h3 span { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--pitch); color: #fff; font-size: 13px; }
+:root[data-theme="dark"] .pay-step h3 span { background: var(--volt); color: var(--pitch); }
+.pay-account { display: grid; gap: 10px; padding: 14px 16px; border-radius: 14px; background: var(--pitch); color: #fff; }
+.pay-account > div { display: grid; gap: 1px; }
+.pay-account small { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.pay-account strong { font-size: 1.05rem; overflow-wrap: anywhere; }
+.pay-account-number { grid-template-columns: 1fr auto; align-items: center; }
+.pay-account-number small { grid-column: 1 / -1; }
+.pay-account-number strong { font-family: var(--display); font-size: 1.7rem; letter-spacing: .08em; }
+.pay-account-number .MuiIconButton-root { color: var(--volt); }
+:root[data-theme="dark"] .pay-account { background: #0b2a1d; border: 1px solid var(--rule); }
+.pay-months { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin: -4px 0 4px 30px; }
+.pay-months button { appearance: none; display: grid; gap: 1px; padding: 8px 6px; border-radius: 10px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: inherit; cursor: pointer; text-align: center; }
+.pay-months button strong { font-family: var(--display); font-size: 15px; letter-spacing: .06em; }
+.pay-months button small { font-size: 11.5px; color: var(--ink-3); }
+.pay-months button.advance { border-style: dashed; }
+.pay-months button.on { background: var(--pitch); border-color: var(--pitch); color: #fff; }
+.pay-months button.on small { color: rgba(255,255,255,.8); }
+.pay-months button:disabled { opacity: .5; cursor: default; }
+.pay-months button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+:root[data-theme="dark"] .pay-months button.on { background: var(--volt); border-color: var(--volt); color: var(--pitch); }
+:root[data-theme="dark"] .pay-months button.on small { color: var(--pitch); }
+.pay-cards { display: grid; gap: 8px; margin: -4px 0 4px 30px; }
+.pay-stepper { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 10px 8px 14px; border-radius: 12px; border: 1px solid var(--rule); border-left-width: 4px; background: var(--card); }
+.pay-stepper.yellow { border-left-color: #facc15; }
+.pay-stepper.red { border-left-color: #b91c1c; }
+.pay-stepper-label { display: grid; font-weight: 600; }
+.pay-stepper-label i { display: none; }
+.pay-stepper-label small { font-weight: 400; font-size: 12.5px; color: var(--ink-3); }
+.pay-stepper-controls { display: flex; align-items: center; gap: 4px; }
+.pay-stepper-controls output { min-width: 28px; text-align: center; font-family: var(--display); font-size: 1.3rem; font-weight: 700; }
+.pay-total { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 14px; border-radius: 12px; background: var(--paper); border: 1px solid var(--rule); }
+.pay-total span { color: var(--ink-2); font-size: 14px; }
+.pay-total strong { font-family: var(--display); font-size: 1.6rem; color: var(--pitch); }
+:root[data-theme="dark"] .pay-total strong { color: var(--volt); }
+.pay-file { position: relative; display: block; padding: 16px; border: 1.5px dashed var(--rule); border-radius: 12px; text-align: center; cursor: pointer; color: var(--ink-2); font-size: 14px; }
+.pay-file.has-file { border-style: solid; border-color: var(--pitch); color: var(--ink); }
+.pay-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.pay-file:focus-within { outline: 2px solid var(--link); outline-offset: 2px; }
+@media (max-width: 600px) { .pay-months, .pay-cards { margin-left: 0; } }
+
+/* ---------- Receipt review (admin) ---------- */
+.receipts-button.MuiButton-root { gap: 8px; }
+.receipt-badge { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: #b8321f; color: #fff; font-size: 12px; font-weight: 700; }
+.receipt-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.receipt-item { display: grid; gap: 8px; padding: 14px 16px; border: 1px solid var(--rule); border-radius: 14px; background: var(--card); }
+.receipt-item.confirmed { opacity: .8; }
+.receipt-item header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.receipt-player { font-family: var(--names, var(--body)); font-size: 1.2rem; font-weight: 600; }
+.receipt-status { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; background: #fef3c7; color: #7a5300; }
+.receipt-status.confirmed { background: #dcfce7; color: #14532d; }
+.receipt-status.rejected { background: #fee2e2; color: #7f1d1d; }
+.receipt-lines { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
+.receipt-lines li { display: flex; justify-content: space-between; gap: 12px; }
+.receipt-lines .dot { display: inline-block; width: 8px; height: 11px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; }
+.receipt-lines .dot.yellow { background: #facc15; }
+.receipt-lines .dot.red { background: #b91c1c; }
+.receipt-lines .receipt-total { border-top: 1px solid var(--rule-soft); padding-top: 6px; margin-top: 2px; }
+.receipt-lines .receipt-sent.ok b { color: #15803d; }
+.receipt-lines .receipt-sent.mismatch b { color: #b8321f; }
+.receipt-note { margin: 0; font-size: 14px; color: var(--ink-2); font-style: italic; }
+.receipt-preview { display: block; width: 100%; max-height: 75vh; object-fit: contain; border: 0; border-radius: 8px; background: var(--paper); }
+iframe.receipt-preview { height: 75vh; }
+
+/* Receipt history */
+.receipt-history-tools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px; }
+.receipt-history-tools .MuiTextField-root { flex: 1 1 160px; min-width: 140px; max-width: 240px; width: auto; }
+.receipt-retention { margin: 0; font-size: 13px; }
+.receipt-reviewer { font-size: 12.5px; }
+.receipt-file-gone { align-self: center; font-size: 13px; color: var(--ink-3); font-style: italic; }
+@media (max-width: 600px) { .receipt-history-tools .MuiTextField-root { max-width: none; } }
+.receipt-retention p { margin: 0; font-size: 13px; }
+.receipt-retention p .MuiButton-root { margin-left: 6px; padding: 0 8px; min-height: 0; vertical-align: baseline; }
+.receipt-retention-form { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; }
+.receipt-retention-form .MuiTextField-root { flex: 1 1 260px; max-width: 340px; }
+.receipt-retention-form .MuiButton-root { margin-top: 26px; }
+
+/* New-version prompt sits above the sticky header. */
+.update-prompt.MuiSnackbar-root { z-index: 1500; }
+.update-prompt .MuiSnackbarContent-root { background: var(--pitch); color: #fff; border-radius: 12px; }

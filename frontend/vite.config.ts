@@ -1,5 +1,19 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import type { Plugin } from "vite";
+
+// Each build gets a unique version. It is compiled into the app and written to
+// /version.json, so open tabs can notice a new deploy and offer to refresh.
+const appVersion = new Date().toISOString();
+function versionFile(): Plugin {
+  return {
+    name: "app-version-file",
+    apply: "build",
+    generateBundle() {
+      this.emitFile({ type: "asset", fileName: "version.json", source: JSON.stringify({ version: appVersion }) });
+    },
+  };
+}
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const proxy = {
@@ -9,7 +23,8 @@ export default defineConfig(({ mode }) => {
     },
   };
   return {
-    plugins: [react()],
+    plugins: [react(), versionFile()],
+    define: { __APP_VERSION__: JSON.stringify(appVersion) },
     server: { port: 5173, strictPort: true, proxy },
     preview: { port: 4173, proxy },
     build: {

@@ -3,9 +3,9 @@ package database
 import (
 	"fmt"
 
+	"github.com/dilly3/edehson-league/adminauth"
 	"github.com/dilly3/edehson-league/membership"
 	"github.com/dilly3/edehson-league/models"
-	"github.com/dilly3/edehson-league/vieweraccess"
 	"gorm.io/gorm"
 )
 
@@ -62,8 +62,8 @@ END $$;
 	if err := membership.Migrate(db); err != nil {
 		return fmt.Errorf("could not migrate Great Minds Sport register: %w", err)
 	}
-	if err := vieweraccess.Migrate(db); err != nil {
-		return fmt.Errorf("could not migrate viewer access: %w", err)
+	if err := adminauth.Migrate(db); err != nil {
+		return fmt.Errorf("could not migrate admin accounts: %w", err)
 	}
 	return nil
 }

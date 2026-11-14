@@ -2,7 +2,7 @@ package router
 
 import (
 	"fmt"
-	"uuid"
+	"github.com/google/uuid"
 
 	"github.com/dilly3/edehson-league/models"
 )
@@ -154,9 +154,11 @@ func validateResult(
 		})
 	}
 
-	if homeGoals != *input.HomeScore || awayGoals != *input.AwayScore {
+	// Goal events are optional: an admin may save just the score, or log only the
+	// goals they know about. Logged goals can never add up to more than the score.
+	if homeGoals > *input.HomeScore || awayGoals > *input.AwayScore {
 		return nil, fmt.Errorf(
-			"goal events produce %d–%d, but the submitted score is %d–%d",
+			"goal events produce %d–%d, which is more than the submitted score of %d–%d",
 			homeGoals,
 			awayGoals,
 			*input.HomeScore,

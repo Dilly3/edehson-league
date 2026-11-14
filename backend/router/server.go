@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 
+	"github.com/dilly3/edehson-league/adminauth"
 	"gorm.io/gorm"
 )
 
@@ -11,6 +12,7 @@ type Server struct {
 	db         *gorm.DB
 	sqldb      *sql.DB
 	admintoken *string
+	auth       *adminauth.Auth
 }
 
 func NewServer(db *gorm.DB, sqldb *sql.DB, adminToken string) (*Server, error) {
